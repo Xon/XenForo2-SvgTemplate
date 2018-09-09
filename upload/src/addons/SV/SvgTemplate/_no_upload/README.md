@@ -6,7 +6,7 @@ Allows SVG (Scalable Vector Graphics) images to be stored as templates. This cre
 
 To include in a template (or css templates INSIDE a style property) use:
 ```
-{{ $xf.getSvg('tempate.svg') }}
+{{ getSvgUrl('tempate.svg') }}
 ```
 
 Under Board information, if "Use Full Friendly URLs" (useFriendlyUrls) is set the URL generated is:
