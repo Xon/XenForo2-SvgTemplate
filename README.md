@@ -4,7 +4,7 @@ Depending on configuration, this add-on requires webserver URL rewrite support!
 
 Allows SVG (Scalable Vector Graphics) images to be stored as templates. This creates a new svg.php file in the XF root directory.
 
-To include in a template (or css templates INSIDE a style property) use:
+To generate a link to an SVG template;
 ```
 {{ getSvgUrl('tempate.svg') }}
 ```
@@ -30,7 +30,7 @@ Under performance Options check "General SVG Template Style Properties "
 ```
 location ^~ /data/svg/ {
    access_log off;
-   rewrite ^/data/svg/([^/]+)/([^/]+)/([^/]+)/([^\.]+).svg$ /svg.php?svg=$4&style=$1&language=$2&d=$3 last;
+   rewrite ^/data/svg/([^/]+)/([^/]+)/([^/]+)/([^\.]+).svg$ /svg.php?svg=$4&s=$1&l=$2&d=$3 last;
    return 403;
 }
 ```
