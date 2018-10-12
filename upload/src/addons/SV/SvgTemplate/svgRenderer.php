@@ -11,16 +11,17 @@ class svgRenderer extends cssRenderer
         $checkedTemplates = [];
         foreach ($templates AS $key => $template)
         {
-            if (preg_match('/^([a-z0-9_]+:|)([a-z0-9_.]+\.svg)$/i', $template, $matches))
+            if (preg_match('/^([a-z0-9_]+:|)([a-z0-9_]+?)(\.svg){0,1}$/i', $template, $matches))
             {
                 if ($matches[1])
                 {
-                    $checkedTemplates[] = $template;
+                    $checkedTemplates[] = $template . '.svg';
                 }
                 else
                 {
-                    $checkedTemplates[] = 'public:' . $template;
+                    $checkedTemplates[] = 'public:' . $template . '.svg';
                 }
+
                 // only support rendering 1 svg at a time
                 break;
             }
