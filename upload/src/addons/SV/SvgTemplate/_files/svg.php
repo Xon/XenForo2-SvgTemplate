@@ -14,8 +14,20 @@ $input = $request->filter([
 	'svg' => 'str',
 	's' => 'uint',
 	'l' => 'uint',
-	'k' => 'str'
+	'k' => 'str',
+    'style' => 'uint',
+    'langauge' => 'uint',
 ]);
+
+//XF1 arguments compatibility
+if (!$input['s'] && $input['style'])
+{
+    $input['s'] = $input['style'];
+}
+if (!$input['l'] && $input['langauge'])
+{
+    $input['l'] = $input['langauge'];
+}
 
 $templater = $app->templater();
 $cache = $app->cache();
