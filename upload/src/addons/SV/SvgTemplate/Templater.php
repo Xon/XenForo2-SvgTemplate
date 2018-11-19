@@ -33,9 +33,15 @@ class Templater
         }
 
         $parts = pathinfo($template);
-        if (($parts['extension'] != 'svg' && $parts['extension'] != '') || ($parts['dirname'] != '' && $parts['dirname'] != '.'))
+        $hasExtension = !empty($parts['extension']);
+        if (($hasExtension && $parts['extension'] !== 'svg') || (!empty($parts['dirname']) && $parts['dirname'] !== '.'))
         {
             return $template;
+        }
+
+        if (!$hasExtension)
+        {
+            $template .= '.svg';
         }
 
         $app = \XF::app();
@@ -48,7 +54,7 @@ class Templater
 
         if ($useFriendlyUrls)
         {
-            $url = "/data/svg/{$styleId}/{$languageId}/{$lastModified}/{$template}.svg";
+            $url = "/data/svg/{$styleId}/{$languageId}/{$lastModified}/{$template}";
         }
         else
         {
