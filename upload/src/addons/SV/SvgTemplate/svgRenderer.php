@@ -46,6 +46,12 @@ class svgRenderer extends cssRenderer
             );
     }
 
+    protected function getIndividualCachedTemplates(array $templates)
+    {
+        // xf_css_cache is silly, so avoid the extra database hit
+        return [];
+    }
+
     protected function renderTemplates(array $templates, array $cached = [], array &$errors = null)
     {
         $errors = [];
@@ -62,11 +68,6 @@ class svgRenderer extends cssRenderer
             $rendered = $this->renderTemplate($template, $error);
             if (is_string($rendered))
             {
-                if ($this->allowCached || $this->useDevModeCache)
-                {
-                    $this->cacheTemplate($template, $rendered);
-                }
-
                 return $rendered;
             }
             else if ($error)
@@ -91,18 +92,6 @@ class svgRenderer extends cssRenderer
 
             $error = null;
             $output = $this->templater->renderTemplate($template, $this->renderParams, false);
-            $updateCache = true;
-
-            if (!$this->allowCached && $this->useDevModeCache && !$this->templater->hasWatcherActionedTemplates())
-            {
-                // if we haven't touched any templates in this pipeline, we can look for a cached template
-                $rendered = $this->getIndividualCachedTemplate($template);
-                if (is_string($rendered))
-                {
-                    $updateCache = false;
-                    return $rendered;
-                }
-            }
 
             return trim($output);
         }
