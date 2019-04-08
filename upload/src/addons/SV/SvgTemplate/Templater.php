@@ -54,11 +54,11 @@ class Templater
 
         if ($useFriendlyUrls)
         {
-            $url = "/data/svg/{$styleId}/{$languageId}/{$lastModified}/{$template}";
+            $url = "data/svg/{$styleId}/{$languageId}/{$lastModified}/{$template}";
         }
         else
         {
-            $url = "/svg.php?svg={$template}&s={$styleId}&l={$languageId}&d={$lastModified}";
+            $url = "svg.php?svg={$template}&s={$styleId}&l={$languageId}&d={$lastModified}";
         }
 
         if ($includeValidation)
