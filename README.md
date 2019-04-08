@@ -35,6 +35,13 @@ location ^~ /data/svg/ {
 }
 ```
 
+## Apache URL rewrite config
+
+```
+#       SVG Support
+RewriteRule ^/data/svg/([^/]+)/([^/]+)/([^/]+)/([^\.]+).svg$ /svg.php?svg=$4&s=$1&l=$2&d=$3$args [L]
+```
+
 ## Requirements
 
 - PHP 5.6 or newer
