@@ -18,12 +18,15 @@ Otherwise
 svg.php?svg=<templateName>&s=<style_id>&l=<langauge_id>&d=<style_last_modified>&k=<key>
 ```
 
-
 ## Enable Template helper to work inside style properties in templates (which are no CSS/SVG)
 
 This is disabled by default.
 
 Under performance Options check "General SVG Template Style Properties "
+
+## XenForo 2 routing integration
+
+While webserver rewrite rules are recommended, this add-on supports extending XenForo's routing system to provide zero-configuration support for SVG Templates
 
 ## Nginx URL rewrite config
 

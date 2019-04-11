@@ -1,6 +1,6 @@
 {
     "from_class": "XF\\Style",
     "to_class": "SV\\SvgTemplate\\XF\\Style",
-    "execute_order": 10,
+    "execute_order": 6647,
     "active": true
 }

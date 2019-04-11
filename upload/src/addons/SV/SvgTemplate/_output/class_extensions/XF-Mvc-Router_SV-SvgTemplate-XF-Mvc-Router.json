@@ -1,0 +1,6 @@
+{
+    "from_class": "XF\\Mvc\\Router",
+    "to_class": "SV\\SvgTemplate\\XF\\Mvc\\Router",
+    "execute_order": 6647,
+    "active": true
+}
