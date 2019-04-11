@@ -12,11 +12,18 @@ class Router extends XFCP_Router
 {
     protected $friendlySvgUrl = 'data/svg/';
     protected $rawSvgUrl = 'svg.php';
+    protected $skipSvgTemplateRouterIntegration = true;
+
+    public function __construct($linkFormatter = null, array $routes = [])
+    {
+        parent::__construct($linkFormatter, $routes);
+        $this->skipSvgTemplateRouterIntegration = empty(\XF::options()->svSvgTemplateRouterIntegration);
+    }
 
     public function routeToController($path, Request $request = null)
     {
         // if $request is null, we're probably just testing a link
-        if ($request === null)
+        if ($request === null || $this->skipSvgTemplateRouterIntegration)
         {
             return parent::routeToController($path, $request);
         }

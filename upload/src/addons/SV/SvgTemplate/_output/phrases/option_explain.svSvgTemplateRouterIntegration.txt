@@ -1,0 +1,1 @@
+Extends the XenForo URL router to support svg.php and /data/svg, can be disabled to avoid some string comparisons
