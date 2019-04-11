@@ -1,1 +1,1 @@
-Support SVG
+Support SVG url's in XF routing layer
