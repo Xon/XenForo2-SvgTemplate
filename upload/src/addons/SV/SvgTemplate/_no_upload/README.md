@@ -40,9 +40,27 @@ location ^~ /data/svg/ {
 
 ## Apache URL rewrite config
 
+Add the rule before the final index.php;
 ```
-#       SVG Support
-RewriteRule ^/data/svg/([^/]+)/([^/]+)/([^/]+)/([^\.]+).svg$ /svg.php?svg=$4&s=$1&l=$2&d=$3$args [L]
+    RewriteRule ^data/svg/([^/]+)/([^/]+)/([^/]+)/([^\.]+).svg$ svg.php?svg=$4&s=$1&l=$2&d=$3 [B,NC,L,QSA]
+```
+
+
+ie, should look similar to;
+```
+    #    If you are having problems with the rewrite rules, remove the "#" from the
+    #    line that begins "RewriteBase" below. You will also have to change the path
+    #    of the rewrite to reflect the path to your XenForo installation.
+    #RewriteBase /xenforo
+
+
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -l [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^.*$ - [NC,L]
+    RewriteRule ^(data/|js/|styles/|install/|favicon\.ico|crossdomain\.xml|robots\.txt) - [NC,L]
+    RewriteRule ^data/svg/([^/]+)/([^/]+)/([^/]+)/([^\.]+).svg$ svg.php?svg=$4&s=$1&l=$2&d=$3 [B,NC,L,QSA]
+    RewriteRule ^.*$ index.php [NC,L]
 ```
 
 ## Requirements
