@@ -17,3 +17,8 @@ namespace SV\SvgTemplate\XF
 {
 	class XFCP_Style extends \XF\Style {}
 }
+
+namespace SV\SvgTemplate\XF\Template
+{
+	class XFCP_Templater extends \XF\Template\Templater {}
+}

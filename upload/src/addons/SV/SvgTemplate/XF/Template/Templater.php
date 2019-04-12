@@ -1,22 +1,21 @@
 <?php
 
-namespace SV\SvgTemplate;
+namespace SV\SvgTemplate\XF\Template;
 
-class Templater
+
+
+/**
+ * Extends \XF\Template\Templater
+ */
+class Templater extends XFCP_Templater
 {
-    /**
-     * @param \XF\Container          $container
-     * @param \XF\Template\Templater $templater
-     */
-    public static function setup(/** @noinspection PhpUnusedParameterInspection */ \XF\Container $container, \XF\Template\Templater &$templater)
+    public function addDefaultHandlers()
     {
-        $func = 'SV\\SvgTemplate\\Templater::fnGetSvgUrl';
-        if (\is_callable('\Closure::fromCallable'))
-        {
-            $func = \Closure::fromCallable($func);
-        }
-        $templater->addFunction('getsvgurl', $func);
+        parent::addDefaultHandlers();
+
+        $this->addFunction('getsvgurl', [$this, 'fnGetSvgUrl']);
     }
+
 
     /**
      * @param \XF\Template\Templater $templater
@@ -25,7 +24,7 @@ class Templater
      * @param bool                   $includeValidation
      * @return string
      */
-    public static function fnGetSvgUrl($templater, &$escape, $template, $includeValidation = false)
+    public function fnGetSvgUrl($templater, &$escape, $template, $includeValidation = false)
     {
         if (!$template)
         {

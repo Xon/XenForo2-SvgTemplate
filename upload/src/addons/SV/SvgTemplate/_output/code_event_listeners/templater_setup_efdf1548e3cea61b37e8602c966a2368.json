@@ -1,9 +1,0 @@
-{
-    "event_id": "templater_setup",
-    "execute_order": 6647,
-    "callback_class": "SV\\SvgTemplate\\Templater",
-    "callback_method": "setup",
-    "active": true,
-    "hint": "",
-    "description": "Inject getSvgUrl function"
-}
