@@ -2,7 +2,6 @@
 
 namespace SV\SvgTemplate\XF;
 
-use SV\SvgTemplate\Templater;
 
 /**
  * Extends \XF\Style
@@ -53,6 +52,14 @@ class Style extends XFCP_Style
     public function injectStylePropertyBits()
     {
         $this->todoReplacement = false;
+
+        /** @var \SV\SvgTemplate\XF\Template\Templater $templater */
+        $templater = \XF::app()->templater();
+        if (!\is_callable([$templater,'fnGetSvgUrl']))
+        {
+            return;
+        }
+
         foreach($this->properties as $key => &$property)
         {
             if (is_array($property))
@@ -60,8 +67,8 @@ class Style extends XFCP_Style
                 foreach($property as $key2 => &$component)
                 {
                     $changes = false;
-                    $data = preg_replace_callback("/{{\s*getSvgUrl\s*\(\s*'([^']+)'\s*\)\s*}}/siux", function ($match) use (&$changes) {
-                        $output = Templater::fnGetSvgUrl(\XF::app()->templater(), $escape, $match[1]);
+                    $data = preg_replace_callback("/{{\s*getSvgUrl\s*\(\s*'([^']+)'\s*\)\s*}}/siux", function ($match) use ($templater, &$changes) {
+                        $output = $templater->fnGetSvgUrl($templater, $escape, $match[1]);
                         $changes = $output != $match[1];
                         return $output;
                     }, $component);
@@ -74,8 +81,8 @@ class Style extends XFCP_Style
             else
             {
                 $changes = false;
-                $data = preg_replace_callback("/{{\s*getSvgUrl\s*\(\s*'([^']+)'\s*\)\s*}}/siux", function ($match) use (&$changes) {
-                    $output = Templater::fnGetSvgUrl(\XF::app()->templater(), $escape, $match[1]);
+                $data = preg_replace_callback("/{{\s*getSvgUrl\s*\(\s*'([^']+)'\s*\)\s*}}/siux", function ($match) use ($templater, &$changes) {
+                    $output = $templater->fnGetSvgUrl(\XF::app()->templater(), $escape, $match[1]);
                     $changes = $output != $match[1];
                     return $output;
                 }, $property);
