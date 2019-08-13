@@ -4,7 +4,7 @@ namespace SV\SvgTemplate;
 
 use XF\CssWriter;
 
-class svgWriter extends cssWriter
+class svgWriter extends CssWriter
 {
     public function finalizeOutput($output)
     {

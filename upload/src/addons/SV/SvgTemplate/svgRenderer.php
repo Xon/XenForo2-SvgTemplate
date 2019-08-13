@@ -4,7 +4,7 @@ namespace SV\SvgTemplate;
 
 use XF\CssRenderer;
 
-class svgRenderer extends cssRenderer
+class svgRenderer extends CssRenderer
 {
     protected function filterValidTemplates(array $templates)
     {
@@ -37,7 +37,7 @@ class svgRenderer extends cssRenderer
         $templates = array_unique($templates);
         sort($templates);
 
-        return 'xfSvfCache_' . md5(
+        return 'xfSvgCache_' . md5(
                 'templates=' . implode(',', $templates)
                 . 'style=' . $elements['style_id']
                 . 'modified=' . $elements['style_last_modified']
