@@ -2,10 +2,39 @@
 
 namespace SV\SvgTemplate;
 
+use SV\RedisCache\RawResponseText;
+use SV\RedisCache\Redis;
+use XF\App;
 use XF\CssRenderer;
+use XF\Http\ResponseStream;
+use XF\Template\Templater;
 
 class svgRenderer extends CssRenderer
 {
+    protected $echoUncompressedData = false;
+
+    public function __construct(App $app, Templater $templater, \Doctrine\Common\Cache\CacheProvider $cache = null)
+    {
+        if ($cache === null)
+        {
+            $cache = \XF::app()->cache('css');
+        }
+        parent::__construct($app, $templater, $cache);
+
+        if ($this->useDevModeCache)
+        {
+            $this->allowCached = true;
+        }
+    }
+
+    /**
+     * @param bool $value
+     */
+    public function setForceRawCache($value)
+    {
+        $this->echoUncompressedData = $value;
+    }
+
     protected function filterValidTemplates(array $templates)
     {
         $checkedTemplates = [];
@@ -30,6 +59,36 @@ class svgRenderer extends CssRenderer
         return $checkedTemplates;
     }
 
+    protected function getFinalCachedOutput(array $templates)
+    {
+        $cache = $this->cache;
+        if (!$this->allowCached || !($cache instanceof Redis) || !($credis = $cache->getCredis(false)))
+        {
+            return parent::getFinalCachedOutput($templates);
+        }
+
+        $key = $cache->getNamespacedId($this->getFinalCacheKey($templates) . '_gz');
+        $credis = $cache->getCredis(true);
+        $data = $credis->hGetAll($key);
+        if (empty($data))
+        {
+            return false;
+        }
+
+        $output = $data['o']; // gzencoded
+        $length = $data['l'];
+
+        if ($this->echoUncompressedData)
+        {
+            return $this->wrapOutput($output, $length);
+        }
+
+        // client doesn't support compression, so decompress before sending it
+        $svg = @\gzdecode($output);
+
+        return $svg;
+    }
+
     protected function getFinalCacheKey(array $templates)
     {
         $elements = $this->getCacheKeyElements();
@@ -44,6 +103,37 @@ class svgRenderer extends CssRenderer
                 . 'language=' . $elements['language_id']
                 . $elements['modifier']
             );
+    }
+
+    /**
+     * @param $output
+     * @param $length
+     * @return ResponseStream
+     */
+    protected function wrapOutput($output, $length)
+    {
+        return new RawResponseText($output, $length);
+    }
+
+    protected function cacheFinalOutput(array $templates, $output)
+    {
+        $cache = $this->cache;
+        if (!$this->allowCached || !$this->allowFinalCacheUpdate || !($cache instanceof Redis) || !($credis = $cache->getCredis(false)))
+        {
+            parent::cacheFinalOutput($templates, $output);
+
+            return;
+        }
+
+        $output = strval($output);
+
+        $key = $cache->getNamespacedId($this->getFinalCacheKey($templates) . '_gz');
+        $credis = $cache->getCredis(false);
+        $credis->hMSet($key, [
+            'o' => \gzencode($output, 9),
+            'l' => strlen($output),
+        ]);
+        $credis->expire($key, 3600);
     }
 
     protected function getIndividualCachedTemplates(array $templates)
@@ -92,14 +182,25 @@ class svgRenderer extends CssRenderer
 
             $error = null;
             $output = $this->templater->renderTemplate($template, $this->renderParams, false);
+            $output = trim($output);
+            if ($output && $this->cache && $this->allowCached)
+            {
+                $output = $this->optimizeSvg($output);
+            }
 
-            return trim($output);
+            return $output;
         }
         catch (\Exception $e)
         {
             \XF::logException($e);
             $error = $e->getMessage();
+
             return false;
         }
+    }
+
+    protected function optimizeSvg($svg)
+    {
+        return $svg;
     }
 }
