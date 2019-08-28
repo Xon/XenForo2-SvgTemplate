@@ -84,7 +84,7 @@ class svgRenderer extends CssRenderer
         }
 
         // client doesn't support compression, so decompress before sending it
-        $svg = @\gzdecode($output);
+        $svg = $output ? @\gzdecode($output) : '';
 
         return $svg;
     }
@@ -112,7 +112,7 @@ class svgRenderer extends CssRenderer
      */
     protected function wrapOutput($output, $length)
     {
-        return new RawResponseText($output, $length);
+        return new RawResponseText($length ? $output : '', $length);
     }
 
     protected function cacheFinalOutput(array $templates, $output)
@@ -130,7 +130,7 @@ class svgRenderer extends CssRenderer
         $key = $cache->getNamespacedId($this->getFinalCacheKey($templates) . '_gz');
         $credis = $cache->getCredis(false);
         $credis->hMSet($key, [
-            'o' => \gzencode($output, 9),
+            'o' => $output ? \gzencode($output, 9) : null,
             'l' => strlen($output),
         ]);
         $credis->expire($key, 3600);

@@ -30,17 +30,23 @@ class svgWriter extends CssWriter
     public function getResponse($output)
     {
         $response = parent::getResponse($output);
+        $hasOutput = false;
         if ($output instanceof ResponseStream)
         {
-            $response->compressIfAble(false);
-            $response->header('content-encoding', 'gzip');
-            $response->header('vary', 'Accept-Encoding');
+            if ($output->getLength())
+            {
+                $hasOutput = true;
+                $response->compressIfAble(false);
+                $response->header('content-encoding', 'gzip');
+                $response->header('vary', 'Accept-Encoding');
+            }
         }
-        if ($output)
+        else if ($output)
         {
+            $hasOutput = true;
             $response->contentType('image/svg+xml', 'utf-8');
         }
-        else
+        if (!$hasOutput)
         {
             $response->contentType('text/html', 'utf-8');
             $message = \XF::phrase('requested_page_not_found');
