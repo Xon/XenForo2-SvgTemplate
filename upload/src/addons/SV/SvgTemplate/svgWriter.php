@@ -30,6 +30,7 @@ class svgWriter extends CssWriter
     public function getResponse($output)
     {
         $response = parent::getResponse($output);
+        $response->contentType('image/svg+xml', 'utf-8');
         $hasOutput = false;
         if ($output instanceof ResponseStream)
         {
@@ -44,13 +45,10 @@ class svgWriter extends CssWriter
         else if ($output)
         {
             $hasOutput = true;
-            $response->contentType('image/svg+xml', 'utf-8');
         }
         if (!$hasOutput)
         {
-            $response->contentType('text/html', 'utf-8');
-            $message = \XF::phrase('requested_page_not_found');
-            $response->body($message);
+            $response->body('');
             $response->httpCode(404);
         }
 
