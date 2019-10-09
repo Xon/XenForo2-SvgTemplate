@@ -44,11 +44,11 @@ class svgRenderer extends CssRenderer
             {
                 if ($matches[1])
                 {
-                    $checkedTemplates[] = $template . '.svg';
+                    $checkedTemplates[] = $matches[2] . '.svg';
                 }
                 else
                 {
-                    $checkedTemplates[] = 'public:' . $template . '.svg';
+                    $checkedTemplates[] = 'public:' . $matches[2] . '.svg';
                 }
 
                 // only support rendering 1 svg at a time
