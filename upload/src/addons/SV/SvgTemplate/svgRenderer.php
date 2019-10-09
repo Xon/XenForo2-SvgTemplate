@@ -43,14 +43,8 @@ class svgRenderer extends CssRenderer
             if (preg_match('/^([a-z0-9_]+:|)([a-z0-9_]+?)(\.svg){0,1}$/i', $template, $matches))
             {
                 $type = $matches[1] ?: 'public:';
-                $templateName = $matches[2] ?: null;
+                $templateName = $matches[2];
                 $extension = $matches[3] ?: '.svg';
-
-                if (!$templateName)
-                {
-                    \XF::logException(new \InvalidArgumentException('No template name provided.'));
-                    continue;
-                }
 
                 $checkedTemplates[] = $type . $templateName . $extension;
 
