@@ -40,19 +40,12 @@ class svgRenderer extends CssRenderer
         $checkedTemplates = [];
         foreach ($templates AS $key => $template)
         {
-            if (preg_match('/^([a-z0-9_]+:|)([a-z0-9_]+?)(\.svg){0,1}$/i', $template, $matches))
+            if (preg_match('/^([a-z0-9_]+:|)([a-z0-9_]+?)(?:\.svg|)$/i', $template, $matches))
             {
                 $type = $matches[1] ?: 'public:';
-                $templateName = $matches[2] ?: null;
                 $extension = $matches[3] ?: '.svg';
 
-                if (!$templateName)
-                {
-                    \XF::logException(new \InvalidArgumentException('No template name provided.'));
-                    continue;
-                }
-
-                $checkedTemplates[] = $type . $templateName . $extension;
+                $checkedTemplates[] = $type . $matches[2] . $extension;
 
                 // only support rendering 1 svg at a time
                 break;
