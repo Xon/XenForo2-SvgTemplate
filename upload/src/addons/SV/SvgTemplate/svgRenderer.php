@@ -42,14 +42,17 @@ class svgRenderer extends CssRenderer
         {
             if (preg_match('/^([a-z0-9_]+:|)([a-z0-9_]+?)(\.svg){0,1}$/i', $template, $matches))
             {
-                if ($matches[1])
+                $type = $matches[1] ?: 'public:';
+                $templateName = $matches[2] ?: null;
+                $extension = $matches[3] ?: '.svg';
+
+                if (!$templateName)
                 {
-                    $checkedTemplates[] = $matches[2] . '.svg';
+                    \XF::logException(new \InvalidArgumentException('No template name provided.'));
+                    continue;
                 }
-                else
-                {
-                    $checkedTemplates[] = 'public:' . $matches[2] . '.svg';
-                }
+
+                $checkedTemplates[] = $type . $templateName . $extension;
 
                 // only support rendering 1 svg at a time
                 break;
