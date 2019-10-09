@@ -43,9 +43,7 @@ class svgRenderer extends CssRenderer
             if (preg_match('/^([a-z0-9_]+:|)([a-z0-9_]+?)(?:\.svg|)$/i', $template, $matches))
             {
                 $type = $matches[1] ?: 'public:';
-                $extension = $matches[3] ?: '.svg';
-
-                $checkedTemplates[] = $type . $matches[2] . $extension;
+                $checkedTemplates[] = $type . $matches[2] . '.svg';
 
                 // only support rendering 1 svg at a time
                 break;
