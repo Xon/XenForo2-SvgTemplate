@@ -31,7 +31,7 @@ class Router extends XFCP_Router
         // strncasecmp should be very fast
         if (strncasecmp($path, $this->friendlySvgUrl, strlen($this->friendlySvgUrl)) === 0)
         {
-            /** @noinspection CssInvalidHtmlTagReference */
+            /** @noinspection RegExpRedundantEscape */
             if (\preg_match('#^data/svg/(?<s>[^/]+)/(?<l>[^/]+)/(?<d>[^/]+)/(?<svg>[^\.]+).svg$#i', $path, $matches, PREG_UNMATCHED_AS_NULL))
             {
                 $input = $request->filter([

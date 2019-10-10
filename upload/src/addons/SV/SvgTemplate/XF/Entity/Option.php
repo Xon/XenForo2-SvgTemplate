@@ -2,9 +2,6 @@
 
 namespace SV\SvgTemplate\XF\Entity;
 
-use XF\Mvc\Entity\Entity;
-use XF\Mvc\Entity\Structure;
-
 /**
  * Extends \XF\Entity\Option
  */
