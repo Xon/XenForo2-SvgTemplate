@@ -2,13 +2,21 @@
 
 namespace SV\SvgTemplate\XF\Template;
 
-
+use SV\SvgTemplate\Globals;
+use XF\App;
+use XF\Language;
 
 /**
  * Extends \XF\Template\Templater
  */
 class Templater extends XFCP_Templater
 {
+    public function __construct(App $app, Language $language, $compiledPath)
+    {
+        parent::__construct($app, $language, $compiledPath);
+        Globals::$templater = $this;
+    }
+
     public function addDefaultHandlers()
     {
         parent::addDefaultHandlers();

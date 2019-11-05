@@ -3,18 +3,14 @@
 namespace SV\SvgTemplate\XF;
 
 
+use SV\SvgTemplate\Globals;
+
 /**
  * Extends \XF\Style
  */
 class Style extends XFCP_Style
 {
     protected $todoReplacement = true;
-
-    public function __construct($id, array $properties, $lastModified = null, array $options = null)
-    {
-        parent::__construct($id, $properties, $lastModified, $options);
-
-    }
 
     public function getProperty($name, $fallback = '')
     {
@@ -53,9 +49,20 @@ class Style extends XFCP_Style
     {
         $this->todoReplacement = false;
 
-        /** @var \SV\SvgTemplate\XF\Template\Templater $templater */
-        $templater = \XF::app()->templater();
-        if (!\is_callable([$templater,'fnGetSvgUrl']))
+        $app = \XF::app();
+        $container = $app->container();
+        if ($container->isCached('templater'))
+        {
+            /** @var \SV\SvgTemplate\XF\Template\Templater $templater */
+            $templater = $app->templater();
+        }
+        else
+        {
+            $templater = Globals::$templater;
+            Globals::$templater = null;
+        }
+
+        if (!$templater || !\is_callable([$templater,'fnGetSvgUrl']))
         {
             return;
         }
