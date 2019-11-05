@@ -55,7 +55,7 @@ class Templater extends XFCP_Templater
 
         $useFriendlyUrls = $app->options()->useFriendlyUrls;
         /** @var \XF\Style $style */
-        $style = $this->app->templater()->getStyle() ?: $this->app->style();
+        $style = $this->getStyle() ?: $this->app->style();
         $styleId = $style->getId();
         $languageId = $templater->getLanguage()->getId();
         $lastModified = ($style ? $style->getLastModified() : \XF::$time);
