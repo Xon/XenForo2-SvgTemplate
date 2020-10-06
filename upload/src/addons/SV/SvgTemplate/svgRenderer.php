@@ -78,9 +78,7 @@ class svgRenderer extends CssRenderer
         }
 
         // client doesn't support compression, so decompress before sending it
-        $svg = $output ? @\gzdecode($output) : '';
-
-        return $svg;
+        return $output ? @\gzdecode($output) : '';
     }
 
     protected function getFinalCacheKey(array $templates)
