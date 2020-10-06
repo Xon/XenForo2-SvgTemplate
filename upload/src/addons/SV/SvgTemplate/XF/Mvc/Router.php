@@ -32,12 +32,15 @@ class Router extends XFCP_Router
         if (strncasecmp($path, $this->friendlySvgUrl, strlen($this->friendlySvgUrl)) === 0)
         {
             /** @noinspection RegExpRedundantEscape */
-            if (\preg_match('#^data/svg/(?<s>[^/]+)/(?<l>[^/]+)/(?<d>[^/]+)/(?<svg>[^\.]+).svg$#i', $path, $matches, PREG_UNMATCHED_AS_NULL))
+            if (\preg_match('#^data/svg/(?<s>[^/]+)/(?<l>[^/]+)/(?<d>[^/]+)/(?<svg>[^\.]+).svg$#i', $path, $matches))
             {
                 $input = $request->filter([
                     'k' => 'str'
                 ]);
 
+                $matches = \array_filter($matches, function ($i){
+                    return $i === null || \strlen($i) === 0;
+                });
                 $match = new RouteMatch();
                 $match->setController('SV\SvgTemplate:SvgRenderer');
                 $match->setAction('index');
