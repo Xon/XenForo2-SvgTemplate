@@ -38,9 +38,6 @@ class Router extends XFCP_Router
                     'k' => 'str'
                 ]);
 
-                $matches = \array_filter($matches, function ($i){
-                    return $i === null || \strlen($i) === 0;
-                });
                 $match = new RouteMatch();
                 $match->setController('SV\SvgTemplate:SvgRenderer');
                 $match->setAction('index');
