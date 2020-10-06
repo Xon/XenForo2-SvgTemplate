@@ -9,8 +9,9 @@
     "faq_url": "",
     "support_url": "https://xenforo.com/community/resources/svg-template-by-xon.6647/",
     "extra_urls": [],
-    "require" : {
-        "php": ["5.6.0", "PHP 5.6.0+"]
+    "require": {
+        "XF": [2010070, "XenForo 2.1.0+"],
+        "php": ["7.0.0", "PHP 7.0.0+"]
     },
     "icon": ""
 }
