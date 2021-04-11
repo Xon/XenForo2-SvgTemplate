@@ -21,7 +21,15 @@ class Templater extends XFCP_Templater
     {
         parent::addDefaultHandlers();
 
-        $this->addFunction('getsvgurl', [$this, 'fnGetSvgUrl']);
+        $callable = [$this, 'fnGetSvgUrl'];
+        $hasFromCallable = is_callable('\Closure::fromCallable');
+        if ($hasFromCallable)
+        {
+            /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
+            $callable = \Closure::fromCallable($callable);
+        }
+
+        $this->addFunction('getsvgurl', $callable);
     }
 
 
