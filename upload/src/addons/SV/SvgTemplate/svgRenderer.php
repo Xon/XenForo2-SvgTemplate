@@ -38,7 +38,7 @@ class svgRenderer extends CssRenderer
     protected function filterValidTemplates(array $templates)
     {
         $checkedTemplates = [];
-        foreach ($templates AS $key => $template)
+        foreach ($templates AS $template)
         {
             if (preg_match('/^([a-z0-9_]+:|)([a-z0-9_]+?)(?:\.svg|)$/i', $template, $matches))
             {
@@ -56,13 +56,12 @@ class svgRenderer extends CssRenderer
     protected function getFinalCachedOutput(array $templates)
     {
         $cache = $this->cache;
-        if (!$this->allowCached || !($cache instanceof Redis) || !($credis = $cache->getCredis(false)))
+        if (!$this->allowCached || !($cache instanceof Redis) || !($credis = $cache->getCredis(true)))
         {
             return parent::getFinalCachedOutput($templates);
         }
 
         $key = $cache->getNamespacedId($this->getFinalCacheKey($templates) . '_gz');
-        $credis = $cache->getCredis(true);
         $data = $credis->hGetAll($key);
         if (empty($data))
         {
@@ -120,7 +119,6 @@ class svgRenderer extends CssRenderer
         $output = strval($output);
 
         $key = $cache->getNamespacedId($this->getFinalCacheKey($templates) . '_gz');
-        $credis = $cache->getCredis(false);
         $credis->hMSet($key, [
             'o' => $output ? \gzencode($output, 9) : null,
             'l' => strlen($output),

@@ -67,11 +67,11 @@ class Style extends XFCP_Style
             return;
         }
 
-        foreach($this->properties as $key => &$property)
+        foreach($this->properties as &$property)
         {
             if (is_array($property))
             {
-                foreach($property as $key2 => &$component)
+                foreach($property as &$component)
                 {
                     $changes = false;
                     $data = preg_replace_callback("/{{\s*getSvgUrl\s*\(\s*'([^']+)'\s*\)\s*}}/siux", function ($match) use ($templater, &$changes) {
