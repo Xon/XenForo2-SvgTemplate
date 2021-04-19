@@ -14,6 +14,7 @@ use XF\Template\Templater;
 
 class svgRenderer extends CssRenderer
 {
+    protected $compactSvg = true;
     protected $echoUncompressedData = false;
 
     public function __construct(App $app, Templater $templater, \Doctrine\Common\Cache\CacheProvider $cache = null)
@@ -24,10 +25,12 @@ class svgRenderer extends CssRenderer
         }
         parent::__construct($app, $templater, $cache);
 
+        //$this->compactSvg = !\XF::$developmentMode;
         if ($this->useDevModeCache)
         {
             $this->allowCached = true;
         }
+        $this->allowCached = false;
     }
 
     public function setForceRawCache(bool $value)
@@ -172,10 +175,11 @@ class svgRenderer extends CssRenderer
 
             $error = null;
             $output = $this->templater->renderTemplate($template, $this->renderParams, false);
-            $output = trim($output);
-            if ($output && $this->cache && $this->allowCached)
+            $output = \utf8_trim($output);
+            // always do rewrite/optimize, as this enables the less => css parsing in the <style> element
+            if (\strlen($output))
             {
-                $output = $this->optimizeSvg($output);
+                $output = $this->rewriteSvg($template, $output);
             }
 
             return $output;
@@ -189,8 +193,161 @@ class svgRenderer extends CssRenderer
         }
     }
 
-    protected function optimizeSvg($svg)
+    /**
+     * @return \Less_Parser
+     * @noinspection PhpMissingReturnTypeInspection
+     */
+    protected function getLessParser()
     {
+        if (!$this->lessParser)
+        {
+            $options = [
+                'compress' => $this->compactSvg,
+                'indentation' => ' ',
+            ];
+            $this->lessParser = new \Less_Parser($options);
+        }
+
+        return $this->lessParser;
+    }
+
+    protected function cleanNodeList(\DOMNode $parentNode, string &$styling)
+    {
+        $compactSvg = $this->compactSvg;
+        // iterate backwards as this allows removing elements, as the list is "dynamic"
+        $nodeList = $parentNode->childNodes;
+        for ($i = $nodeList->length - 1; $i >= 0; $i--)
+        {
+            /** @var \DOMNode $node */
+            $node = $nodeList->item($i);
+            $checkChildren = true;
+            switch ($node->nodeType)
+            {
+                case XML_ELEMENT_NODE:
+                    $nodeName = $node->nodeName;
+                    if ($nodeName === 'style')
+                    {
+                        $styling .= "\n" . $node->textContent;
+                        $node->parentNode->removeChild($node);
+                        $checkChildren = false;
+                        break;
+                    }
+                    else if ($compactSvg)
+                    {
+                        if (\preg_match("#^(?:sodipodi:|inkscape:|metadata|desc)#usi", $nodeName))
+                        {
+                            $node->parentNode->removeChild($node);
+                            $checkChildren = false;
+                        }
+                        else if ($node->hasAttributes())
+                        {
+                            $attributes = $node->attributes;
+                            for ($i2 = $attributes->length - 1; $i2 >= 0; $i2--)
+                            {
+                                /** @var \DOMAttr $attribute */
+                                $attribute = $attributes->item($i2);
+                                if (\preg_match("#^(?:sodipodi:|inkscape:)#usi", $attribute->name))
+                                {
+                                    $attributes->removeNamedItem();
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case XML_TEXT_NODE:
+                    if ($compactSvg && !$node->hasAttributes())
+                    {
+                        $nodeText = $node->textContent;
+                        if (\strlen($nodeText))
+                        {
+                            $nodeText = trim($nodeText);
+                            if (!\strlen($nodeText))
+                            {
+                                $node->parentNode->removeChild($node);
+                                $checkChildren = false;
+                            }
+                        }
+                    }
+                    break;
+                case XML_COMMENT_NODE:
+                    $node->parentNode->removeChild($node);
+                    $checkChildren = false;
+                    break;
+            }
+
+            if ($checkChildren)
+            {
+                $this->cleanNodeList($node, $styling);
+            }
+        }
+    }
+
+    protected function rewriteSvg(string $template, string $svg): string
+    {
+        // An svg is just plain-text XML. so we can load, prune and save
+        $doc = new \DOMDocument();
+        $doc->preserveWhiteSpace = false;
+        libxml_use_internal_errors(true);
+        try
+        {
+            $doc->loadXML($svg, LIBXML_NOBLANKS | LIBXML_NONET | LIBXML_NSCLEAN | LIBXML_NOXMLDECL);
+        }
+        catch (\Exception $e)
+        {
+            \XF::logException($e);
+            // failed for some reason, return as-is
+            return $svg;
+        }
+        finally
+        {
+            libxml_clear_errors();
+        }
+
+        $rootElement = $doc->documentElement;
+        $doc->encoding = 'utf-8';
+        $doc->formatOutput = false;
+
+        $rootElement->removeAttribute('xml:space');
+        $styling = '';
+        $this->cleanNodeList($rootElement, $styling);
+
+        // convert various styling blocks less => css
+        $styling = \utf8_trim($styling);
+        if (\strlen($styling))
+        {
+            $parser = $this->getFreshLessParser();
+
+            $output = $this->prepareLessForRendering($styling);
+            if (\is_callable([$this, 'getLessPrependForPrefix']))
+            {
+                $output = $this->getLessPrepend() . $this->getLessPrependForPrefix($template) . $output;
+            }
+            else
+            {
+                $output = $this->getLessPrepend() . $output;
+            }
+
+            try
+            {
+                $css = $parser->parse($output)->getCss();
+            }
+            catch (\Exception $e)
+            {
+                \XF::logException($e);
+                // failed for some reason, return as-is
+                return $svg;
+            }
+
+            $rootElement->insertBefore($doc->createElement('style', $css), $rootElement->lastChild);
+        }
+
+        $cleanSvg = $doc->saveXML($rootElement);
+        if (\strlen($cleanSvg))
+        {
+            return $cleanSvg;
+        }
+
+        // failed for some reason, return as-is
         return $svg;
     }
 }
