@@ -25,12 +25,12 @@ class svgRenderer extends CssRenderer
         }
         parent::__construct($app, $templater, $cache);
 
-        //$this->compactSvg = !\XF::$developmentMode;
+        $this->compactSvg = !\XF::$developmentMode;
         if ($this->useDevModeCache)
         {
+            $this->compactSvg = true;
             $this->allowCached = true;
         }
-        $this->allowCached = false;
     }
 
     public function setForceRawCache(bool $value)
