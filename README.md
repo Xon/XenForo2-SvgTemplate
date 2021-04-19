@@ -65,4 +65,4 @@ ie, should look similar to;
 
 ## Requirements
 
-- PHP 5.6 or newer
+- PHP 7.0+ or newer
