@@ -1,4 +1,7 @@
 <?php
+/**
+ * @noinspection PhpMissingReturnTypeInspection
+ */
 
 namespace SV\SvgTemplate;
 
@@ -27,10 +30,7 @@ class svgRenderer extends CssRenderer
         }
     }
 
-    /**
-     * @param bool $value
-     */
-    public function setForceRawCache($value)
+    public function setForceRawCache(bool $value)
     {
         $this->echoUncompressedData = $value;
     }

@@ -1,7 +1,9 @@
 <?php
+/**
+ * @noinspection PhpMissingReturnTypeInspection
+ */
 
 namespace SV\SvgTemplate\XF;
-
 
 use SV\SvgTemplate\Globals;
 
