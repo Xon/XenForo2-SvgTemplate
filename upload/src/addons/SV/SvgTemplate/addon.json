@@ -14,6 +14,7 @@
         "php": ["7.0.0", "PHP 7.0.0+"]
     },
     "require-soft": {
+        "php-ext/imagemagick": ["*", "PHP ImageMagick Extension"],
         "SV/BrowserDetection": [2000200, "Browser Detection v2.0.2+"]
     },
     "icon": ""
