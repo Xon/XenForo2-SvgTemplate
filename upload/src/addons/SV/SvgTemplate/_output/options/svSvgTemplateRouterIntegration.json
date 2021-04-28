@@ -5,8 +5,10 @@
     "sub_options": [],
     "validation_class": "",
     "validation_method": "",
+    "advanced": false,
     "default_value": "1",
     "relations": {
-        "performance": 7810
+        "performance": 7810,
+        "svSvgTemplate": 10
     }
 }
