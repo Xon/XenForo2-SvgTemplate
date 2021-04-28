@@ -13,5 +13,8 @@
         "XF": [2010070, "XenForo 2.1.0+"],
         "php": ["7.0.0", "PHP 7.0.0+"]
     },
+    "require-soft": {
+        "SV/BrowserDetection": [2000200, "Browser Detection v2.0.2+"]
+    },
     "icon": ""
 }
