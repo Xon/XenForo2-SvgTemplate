@@ -81,8 +81,11 @@ class svgWriter extends CssWriter
             {
                 $hasOutput = true;
                 $response->compressIfAble(false);
-                $response->header('content-encoding', 'gzip');
-                $response->header('vary', 'Accept-Encoding');
+                if (!$this->isRenderingPng())
+                {
+                    $response->header('content-encoding', 'gzip');
+                    $response->header('vary', 'Accept-Encoding');
+                }
             }
         }
         else if ($output)
@@ -118,6 +121,7 @@ class svgWriter extends CssWriter
                     FileUtil::copyFileToAbstractedPath($tmpPath, $abstractPath);
                 }
 
+                $response->compressIfAble(false);
                 $response->body($response->responseStream($fs->readStream($abstractPath), $fs->getSize($abstractPath)));
             }
         }
