@@ -1,0 +1,1 @@
+Render SVG's as PNG for mobile devices

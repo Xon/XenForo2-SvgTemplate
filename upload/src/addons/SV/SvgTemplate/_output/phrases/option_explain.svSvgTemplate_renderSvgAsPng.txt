@@ -1,0 +1,1 @@
+If checked and <a href="https://xenforo.com/community/resources/7223/" target="_blank">Brower Detection</a> add-on is installed with ImageMagick PHP extension, SVG templates will be rendered as PNG.
