@@ -14,7 +14,7 @@ use XF\Util\File as FileUtil;
 
 class svgWriter extends CssWriter
 {
-    const SVG_TO_PNG_ABSTRACT_PATH = 'internal-data://sv/svg_template/svg_rendered_png/%s';
+    const SVG_TO_PNG_ABSTRACT_PATH = 'internal-data://sv/svg_template/svg_rendered_png/%s.png';
 
     public function run(array $templates, $styleId, $languageId, $validation = null)
     {
@@ -107,8 +107,9 @@ class svgWriter extends CssWriter
                     $tmpPath = FileUtil::getTempFile();
 
                     $im = new \Imagick();
+                    $im->setBackgroundColor(new \ImagickPixel('transparent'));
                     $im->readImageBlob($output);
-                    $im->setImageFormat('png24');
+                    $im->setImageFormat('png');
                     $im->writeImage($tmpPath);
                     $im->clear();
                     $im->destroy();
