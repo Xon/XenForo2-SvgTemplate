@@ -32,12 +32,15 @@ if (!$input['l'] && $input['langauge'])
 $templater = $app->templater();
 $cache = $app->cache();
 $c = $app->container();
-/** @var \SV\SvgTemplate\svgRenderer $renderer */
+
 $rendererClass = $app->extendClass('SV\SvgTemplate\svgRenderer');
+$writerClass = $app->extendClass('SV\SvgTemplate\svgWriter');
+
+/** @var \SV\SvgTemplate\svgRenderer $renderer */
 $renderer = new $rendererClass($app, $templater, $cache);
+
 /** @var \SV\SvgTemplate\svgWriter $writer */
-$class = $app->extendClass('SV\SvgTemplate\svgWriter');
-$writer = new $class($app, $renderer);
+$writer = new $writerClass($app, $renderer);
 $writer->setValidator($c['css.validator']);
 
 $showDebugOutput = (\XF::$debugMode && $request->get('_debug'));

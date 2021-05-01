@@ -7,6 +7,8 @@
 namespace SV\SvgTemplate\XF\Template;
 
 use SV\SvgTemplate\Globals;
+use SV\SvgTemplate\Helper\Svg2png;
+use SV\SvgTemplate\XF\Template\Exception\UnsupportedExtensionProvidedException;
 use XF\App;
 use XF\Language;
 
@@ -51,16 +53,28 @@ class Templater extends XFCP_Templater
             throw new \LogicException('$templateName is required');
         }
 
-        $parts = pathinfo($template);
-        $hasExtension = !empty($parts['extension']);
-        if (($hasExtension && $parts['extension'] !== 'svg') || (!empty($parts['dirname']) && $parts['dirname'] !== '.'))
+        $parts = \pathinfo($template);
+        $extension = $parts['extension'];
+
+        $supportedExtensions = ['svg', 'png'];
+        $hasExtension = !empty($extension);
+        $finalExtension = Svg2png::requiresConvertingSvg2Png() ? 'png' : 'svg';
+
+        if (
+            ($hasExtension && !\in_array($extension, $supportedExtensions, true)) // unsupported extension
+            || (!empty($parts['dirname']) && $parts['dirname'] !== '.') // contains path info
+        )
         {
-            return $template;
+            throw new UnsupportedExtensionProvidedException($template);
         }
 
-        if (!$hasExtension)
+        if ($hasExtension)
         {
-            $template .= '.svg';
+            $template = \preg_replace('/\..+$/', '.' . $finalExtension, $template);
+        }
+        else
+        {
+            $template .= '.' . $finalExtension;
         }
 
         $app = \XF::app();

@@ -7,6 +7,7 @@ namespace SV\SvgTemplate;
 
 use SV\RedisCache\RawResponseText;
 use SV\RedisCache\Redis;
+use SV\SvgTemplate\Exception\UnableToRewriteSvgException;
 use XF\App;
 use XF\CssRenderer;
 use XF\Http\ResponseStream;
@@ -16,6 +17,7 @@ class svgRenderer extends CssRenderer
 {
     protected $compactSvg = true;
     protected $echoUncompressedData = false;
+    protected $isRenderingPng = false;
 
     public function __construct(App $app, Templater $templater, \Doctrine\Common\Cache\CacheProvider $cache = null)
     {
@@ -33,6 +35,11 @@ class svgRenderer extends CssRenderer
         }
     }
 
+    public function isRenderingPng(): bool
+    {
+        return $this->isRenderingPng;
+    }
+
     public function setForceRawCache(bool $value)
     {
         $this->echoUncompressedData = $value;
@@ -43,14 +50,22 @@ class svgRenderer extends CssRenderer
         $checkedTemplates = [];
         foreach ($templates AS $template)
         {
-            if (preg_match('/^([a-z0-9_]+:|)([a-z0-9_]+?)(?:\.svg|)$/i', $template, $matches))
+            if (!preg_match('/^([a-z0-9_]+:|)([a-z0-9_]+?)(?:\.(svg|png)|)$/i', $template, $matches))
             {
-                $type = $matches[1] ?: 'public:';
-                $checkedTemplates[] = $type . $matches[2] . '.svg';
-
-                // only support rendering 1 svg at a time
-                break;
+                continue;
             }
+
+            if (!\in_array($matches[3], ['svg', 'png']))
+            {
+                continue;
+            }
+
+            $type = $matches[1] ?: 'public:';
+            $checkedTemplates[] = $type . $matches[2] . '.svg';
+
+            // only support rendering 1 svg/png at a time
+            $this->isRenderingPng = true;
+            break;
         }
 
         return $checkedTemplates;
@@ -342,12 +357,12 @@ class svgRenderer extends CssRenderer
         }
 
         $cleanSvg = $doc->saveXML($rootElement);
-        if (\strlen($cleanSvg))
+        if (!\strlen($cleanSvg))
         {
-            return $cleanSvg;
+            // failed for some reason, not returning as-is because it **might** contain funny stuff
+            throw new UnableToRewriteSvgException($template);
         }
 
-        // failed for some reason, return as-is
-        return $svg;
+        return $cleanSvg;
     }
 }
