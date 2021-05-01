@@ -93,6 +93,11 @@ class svgWriter extends CssWriter
         {
             if ($this->isRenderingPng())
             {
+                if ($output instanceof ResponseStream)
+                {
+                    $output = \gzdecode($output->getContents());
+                }
+
                 $hash = \md5($output);
                 $abstractPath = \sprintf(static::SVG_TO_PNG_ABSTRACT_PATH, $hash);
                 $fs = $this->fs();
@@ -102,7 +107,7 @@ class svgWriter extends CssWriter
                     $tmpPath = FileUtil::getTempFile();
 
                     $im = new \Imagick();
-                    $im->readImageBlob($abstractPath);
+                    $im->readImageBlob($output);
                     $im->setImageFormat('png24');
                     $im->writeImage($tmpPath);
                     $im->clear();
