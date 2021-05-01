@@ -52,12 +52,13 @@ class svgRenderer extends CssRenderer
         {
             if (!preg_match('/^([a-z0-9_]+:|)([a-z0-9_]+?)(?:\.(svg|png)|)$/i', $template, $matches))
             {
-                continue;
+                break;
             }
 
-            if (!\in_array($matches[3], ['svg', 'png']))
+            $extension = $matches[3] ?? '';
+            if ($extension && !\in_array($extension, ['svg', 'png']))
             {
-                continue;
+                break;
             }
 
             $type = $matches[1] ?: 'public:';
