@@ -33,7 +33,7 @@ While webserver rewrite rules are recommended, this add-on supports extending Xe
 ```
 location ^~ /data/svg/ {
    access_log off;
-   rewrite ^/data/svg/([^/]+)/([^/]+)/([^/]+)/([^\.]+).svg$ /svg.php?svg=$4&s=$1&l=$2&d=$3$args last;
+   rewrite ^/data/svg/([^/]+)/([^/]+)/([^/]+)/([^\.]+.svg)$ /svg.php?svg=$4&s=$1&l=$2&d=$3$args last;
    return 403;
 }
 ```
@@ -42,7 +42,7 @@ location ^~ /data/svg/ {
 
 Add the rule before the final index.php;
 ```
-    RewriteRule ^data/svg/([^/]+)/([^/]+)/([^/]+)/([^\.]+).svg$ svg.php?svg=$4&s=$1&l=$2&d=$3 [B,NC,L,QSA]
+    RewriteRule ^data/svg/([^/]+)/([^/]+)/([^/]+)/([^\.]+.svg)$ svg.php?svg=$4&s=$1&l=$2&d=$3 [B,NC,L,QSA]
 ```
 
 
@@ -59,7 +59,7 @@ ie, should look similar to;
     RewriteCond %{REQUEST_FILENAME} -d
     RewriteRule ^.*$ - [NC,L]
     RewriteRule ^(data/|js/|styles/|install/|favicon\.ico|crossdomain\.xml|robots\.txt) - [NC,L]
-    RewriteRule ^data/svg/([^/]+)/([^/]+)/([^/]+)/([^\.]+).svg$ svg.php?svg=$4&s=$1&l=$2&d=$3 [B,NC,L,QSA]
+    RewriteRule ^data/svg/([^/]+)/([^/]+)/([^/]+)/([^\.]+.svg)$ svg.php?svg=$4&s=$1&l=$2&d=$3 [B,NC,L,QSA]
     RewriteRule ^.*$ index.php [NC,L]
 ```
 
