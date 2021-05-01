@@ -17,7 +17,8 @@ class Svg2png
     public static function supportForSvg2PngEnabled() : bool
     {
         $app = \XF::app();
-        if (!$app->options()->svSvgTemplate_renderSvgAsPng)
+        $renderSvgAsPng = $app->options()->svSvgTemplate_renderSvgAsPng ?? false;
+        if (!$renderSvgAsPng)
         {
             return false;
         }
