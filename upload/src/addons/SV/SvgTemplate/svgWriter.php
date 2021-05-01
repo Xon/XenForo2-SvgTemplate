@@ -118,20 +118,12 @@ class svgWriter extends CssWriter
                     FileUtil::copyFileToAbstractedPath($tmpPath, $abstractPath);
                 }
 
-                $response->responseStream($fs->readStream($abstractPath), $fs->getSize($abstractPath));
+                $response->body($response->responseStream($fs->readStream($abstractPath), $fs->getSize($abstractPath)));
             }
         }
         else
         {
-            if ($this->isRenderingPng())
-            {
-                $response->responseFile(\XF::getRootDirectory() . '/styles/default/xenforo/missing-image.png');
-            }
-            else
-            {
-                $response->body('');
-            }
-
+            $response->body('');
             $response->httpCode(404);
         }
 
