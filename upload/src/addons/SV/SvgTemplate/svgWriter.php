@@ -59,6 +59,7 @@ class svgWriter extends CssWriter
             // no clue why charset is empty string but trying to replicate whatever I saw in:
             // \XF\Pub\View\Error\EmbeddedImageRequest::renderRaw
             $response->contentType('image/png', '');
+            $response->body('');
         }
         else
         {
@@ -117,7 +118,7 @@ class svgWriter extends CssWriter
                     FileUtil::copyFileToAbstractedPath($tmpPath, $abstractPath);
                 }
 
-                $response->responseStream($fs->readStream($abstractPath));
+                $response->responseStream($fs->readStream($abstractPath), $fs->getSize($abstractPath));
             }
         }
         else
