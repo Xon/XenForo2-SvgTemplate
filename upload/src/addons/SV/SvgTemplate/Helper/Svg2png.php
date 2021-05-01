@@ -29,7 +29,22 @@ class Svg2png
             return false;
         }
 
-        return \extension_loaded('imagick');
+        if (!\extension_loaded('imagick'))
+        {
+            return false;
+        }
+
+        if (!\Imagick::queryFormats('SVG'))
+        {
+            return false;
+        }
+
+        if (!\Imagick::queryFormats('PNG'))
+        {
+            return false;
+        }
+
+        return true;
     }
 
     /**
