@@ -8,6 +8,7 @@ namespace SV\SvgTemplate;
 use SV\RedisCache\RawResponseText;
 use SV\RedisCache\Redis;
 use SV\SvgTemplate\Exception\UnableToRewriteSvgException;
+use SV\SvgTemplate\Helper\Svg2png;
 use XF\App;
 use XF\CssRenderer;
 use XF\Http\ResponseStream;
@@ -64,10 +65,14 @@ class svgRenderer extends CssRenderer
                 case 'svg':
                     break;
                 case 'png':
+                    if (!Svg2png::supportForSvg2PngEnabled())
+                    {
+                        return [];
+                    }
                     $this->isRenderingPng = true;
                     break;
                 default:
-                    break 2;
+                    return [];
             }
 
             $type = $matches[1] ?: 'public:';
