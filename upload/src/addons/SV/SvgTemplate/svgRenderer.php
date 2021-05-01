@@ -47,6 +47,7 @@ class svgRenderer extends CssRenderer
 
     protected function filterValidTemplates(array $templates)
     {
+        // only support rendering 1 svg/png at a time
         $checkedTemplates = [];
         foreach ($templates AS $template)
         {
@@ -56,16 +57,22 @@ class svgRenderer extends CssRenderer
             }
 
             $extension = $matches[3] ?? '';
-            if ($extension && !\in_array($extension, ['svg', 'png']))
+
+            switch($extension)
             {
-                break;
+                case '':
+                case 'svg':
+                    break;
+                case 'png':
+                    $this->isRenderingPng = true;
+                    break;
+                default:
+                    break 2;
             }
 
             $type = $matches[1] ?: 'public:';
             $checkedTemplates[] = $type . $matches[2] . '.svg';
 
-            // only support rendering 1 svg/png at a time
-            $this->isRenderingPng = true;
             break;
         }
 
