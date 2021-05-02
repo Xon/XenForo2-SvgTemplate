@@ -9,14 +9,9 @@ use XF\App as BaseApp;
 use XF\CssWriter;
 use XF\Http\ResponseStream;
 use XF\Http\Response;
-use League\Flysystem\MountManager as FlysystemMountManager;
-use XF\Util\File as FileUtil;
 
 class svgWriter extends CssWriter
 {
-    const CACHE_PNG = false;
-    const SVG_TO_PNG_ABSTRACT_PATH = 'internal-data://sv/svg_template/svg_rendered_png/%s.png';
-
     public function run(array $templates, $styleId, $languageId, $validation = null)
     {
         $request = \XF::app()->request();
@@ -103,15 +98,21 @@ class svgWriter extends CssWriter
                     $output = \gzdecode($output->getContents());
                 }
 
-                $img = null;
-                $caching = static::CACHE_PNG;
-                $hash = \md5($output);
-                $abstractPath = \sprintf(static::SVG_TO_PNG_ABSTRACT_PATH, $hash);
-                $fs = $this->fs();
-
-                if ($caching && $fs->has($abstractPath))
+                $cacheKey = $cacheObj = $img = null;
+                $caching = $this->app()->options()->svSvgTemplate_cacheRenderedSvg ?? false;
+                if ($caching)
                 {
-                    $img = $response->responseStream($fs->readStream($abstractPath), $fs->getSize($abstractPath));
+                    $cacheKey = 'svSvg_Png_' . \md5($output);
+                    $cacheObj = $this->app()->cache('sv-svg-img', false);
+                    if (!$cacheObj)
+                    {
+                        $cacheObj = $this->app()->cache('css', false);
+                    }
+                }
+
+                if ($cacheObj)
+                {
+                    $img = $cacheObj->fetch($cacheKey);
                 }
 
                 if (!$img)
@@ -123,15 +124,23 @@ class svgWriter extends CssWriter
                     $img = $im->getImageBlob();
                     $im->clear();
                     $im->destroy();
+
+                    if ($cacheObj)
+                    {
+                        $cacheObj->save($cacheKey, $img, 3600);
+                    }
                 }
 
-                if ($caching)
+                if ($img)
                 {
-                    $fs->write($abstractPath, $img);
+                    $response->compressIfAble(false);
+                    $response->body($img);
                 }
-
-                $response->compressIfAble(false);
-                $response->body($img);
+                else
+                {
+                    $response->body('');
+                    $response->httpCode(404);
+                }
             }
         }
         else
@@ -158,13 +167,5 @@ class svgWriter extends CssWriter
     protected function app() : BaseApp
     {
         return $this->app;
-    }
-
-    /**
-     * @return FlysystemMountManager
-     */
-    protected function fs() : FlysystemMountManager
-    {
-        return $this->app()->fs();
     }
 }

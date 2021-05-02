@@ -1,0 +1,2 @@
+Use the caching to avoid re-encoding SVGs as PNGs.<br/>
+Requires defining the caching context "sv-svg-img" or "css"
