@@ -14,6 +14,7 @@ use XF\Util\File as FileUtil;
 
 class svgWriter extends CssWriter
 {
+    const CACHE_PNG = false;
     const SVG_TO_PNG_ABSTRACT_PATH = 'internal-data://sv/svg_template/svg_rendered_png/%s.png';
 
     public function run(array $templates, $styleId, $languageId, $validation = null)
@@ -102,27 +103,35 @@ class svgWriter extends CssWriter
                     $output = \gzdecode($output->getContents());
                 }
 
+                $img = null;
+                $caching = static::CACHE_PNG;
                 $hash = \md5($output);
                 $abstractPath = \sprintf(static::SVG_TO_PNG_ABSTRACT_PATH, $hash);
                 $fs = $this->fs();
 
-                if (!$fs->has($abstractPath))
+                if ($caching && $fs->has($abstractPath))
                 {
-                    $tmpPath = FileUtil::getTempFile();
+                    $img = $response->responseStream($fs->readStream($abstractPath), $fs->getSize($abstractPath));
+                }
 
+                if (!$img)
+                {
                     $im = new \Imagick();
                     $im->setBackgroundColor(new \ImagickPixel('transparent'));
                     $im->readImageBlob($output);
                     $im->setImageFormat('png');
-                    $im->writeImage($tmpPath);
+                    $img = $im->getImageBlob();
                     $im->clear();
                     $im->destroy();
+                }
 
-                    FileUtil::copyFileToAbstractedPath($tmpPath, $abstractPath);
+                if ($caching)
+                {
+                    $fs->write($abstractPath, $img);
                 }
 
                 $response->compressIfAble(false);
-                $response->body($response->responseStream($fs->readStream($abstractPath), $fs->getSize($abstractPath)));
+                $response->body($img);
             }
         }
         else
