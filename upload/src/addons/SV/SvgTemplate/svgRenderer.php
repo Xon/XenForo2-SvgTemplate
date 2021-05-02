@@ -132,8 +132,9 @@ class svgRenderer extends CssRenderer
      * @param $length
      * @return ResponseStream
      */
-    protected function wrapOutput($output, $length)
+    protected function wrapOutput($output, $length): ResponseStream
     {
+        // note; this is only called when SV/RedisCache add-on is installed, any type checks should be again ResponseStream.
         return new RawResponseText($length ? $output : '', $length);
     }
 
