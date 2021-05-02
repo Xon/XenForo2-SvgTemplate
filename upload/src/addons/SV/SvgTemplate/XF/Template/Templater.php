@@ -40,10 +40,9 @@ class Templater extends XFCP_Templater
 
     public function addDefaultParams(array $params)
     {
-        $xf = $params['xf'] ?? null;
-        if ($xf !== null)
+        if (isset($params['xf']))
         {
-            $this->injectSvgArgs($xf);
+            $this->injectSvgArgs($params['xf']);
         }
 
         parent::addDefaultParams($params);
