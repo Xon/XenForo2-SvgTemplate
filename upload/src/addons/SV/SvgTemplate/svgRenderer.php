@@ -14,6 +14,11 @@ use XF\CssRenderer;
 use XF\Http\ResponseStream;
 use XF\Template\Templater;
 
+/**
+ * Class svgRenderer
+ *
+ * @property \SV\SvgTemplate\XF\Template\Templater templater
+ */
 class svgRenderer extends CssRenderer
 {
     protected $compactSvg = true;
@@ -27,6 +32,7 @@ class svgRenderer extends CssRenderer
             $cache = \XF::app()->cache('css');
         }
         parent::__construct($app, $templater, $cache);
+        $this->templater->automaticSvgUrlWriting = false;
 
         $this->compactSvg = !\XF::$developmentMode;
         if ($this->useDevModeCache)
@@ -34,6 +40,12 @@ class svgRenderer extends CssRenderer
             $this->compactSvg = true;
             $this->allowCached = true;
         }
+    }
+
+    public function setTemplater(Templater $templater)
+    {
+        $this->templater = $templater;
+        $this->templater->automaticSvgUrlWriting = false;
     }
 
     public function isRenderingPng(): bool

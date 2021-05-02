@@ -1,0 +1,6 @@
+{
+    "from_class": "XF\\CssRenderer",
+    "to_class": "SV\\SvgTemplate\\XF\\CssRenderer",
+    "execute_order": 6647,
+    "active": true
+}

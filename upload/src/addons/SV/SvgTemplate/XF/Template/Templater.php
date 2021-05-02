@@ -17,6 +17,8 @@ use XF\Language;
  */
 class Templater extends XFCP_Templater
 {
+    public $automaticSvgUrlWriting = true;
+
     public function __construct(App $app, Language $language, $compiledPath)
     {
         parent::__construct($app, $language, $compiledPath);
@@ -58,7 +60,7 @@ class Templater extends XFCP_Templater
 
         $supportedExtensions = ['svg', 'png'];
         $hasExtension = !empty($extension);
-        $finalExtension = Svg2png::requiresConvertingSvg2Png() ? 'png' : 'svg';
+        $finalExtension = $this->automaticSvgUrlWriting && Svg2png::requiresConvertingSvg2Png() ? 'png' : 'svg';
 
         if (
             ($hasExtension && !\in_array($extension, $supportedExtensions, true)) // unsupported extension
@@ -68,14 +70,7 @@ class Templater extends XFCP_Templater
             throw new UnsupportedExtensionProvidedException($template);
         }
 
-        if ($hasExtension)
-        {
-            $template = \preg_replace('/\..+$/', '.' . $finalExtension, $template);
-        }
-        else
-        {
-            $template .= '.' . $finalExtension;
-        }
+        $template = $parts['filename'] . '.' . $finalExtension;
 
         $app = \XF::app();
 
