@@ -18,6 +18,15 @@ Otherwise
 svg.php?svg=<templateName>&s=<style_id>&l=<langauge_id>&d=<style_last_modified>
 ```
 
+# Render to PNG
+
+This requires imagick with SVG support, and may have odd limitations.
+
+Ubuntu (using https://launchpad.net/~ondrej/+archive/ubuntu/php PPA);
+```
+apt install php7.4-imagick libmagickcore-6.q16-3-extra
+```
+
 ## Conditional rendering SVGs to PNG (for CSS/LESS)
 
 
