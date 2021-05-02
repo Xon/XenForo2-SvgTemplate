@@ -24,7 +24,8 @@ This requires imagick with SVG support, and may have odd limitations.
 
 Ubuntu (using https://launchpad.net/~ondrej/+archive/ubuntu/php PPA);
 ```
-apt install php7.4-imagick libmagickcore-6.q16-3-extra
+sudo apt install php7.4-imagick libmagickcore-6.q16-3-extra
+sudo systemctl restart php7.4-fpm
 ```
 
 ## Conditional rendering SVGs to PNG (for CSS/LESS)
