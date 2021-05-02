@@ -1,0 +1,11 @@
+<xf:checkboxrow html="{$listedHtml}"
+				rowclass="{$rowClass}"
+				hint="{$hintHtml}"
+				explain="{{ phrase('option_explain.svSvgTemplate_renderSvgAsPng', {
+					'browser_detection_status': $browserDetectionStatus ? phrase('yes') : phrase('no'),
+					'imagick_status': $imagickStatus ? phrase('yes') : phrase('no'),
+					'imagick_svg_format_status': $imagickSvgFormatStatus ? phrase('yes') : phrase('no'),
+					'imagick_png_format_status': $imagickPngFormatStatus ? phrase('yes') : phrase('no')
+				})|raw }}">
+	<xf:option name="{$inputName}" selected="{$option.option_value}" label="{$option.title}" />
+</xf:checkboxrow>

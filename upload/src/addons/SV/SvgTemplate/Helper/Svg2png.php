@@ -10,6 +10,17 @@ use SV\BrowserDetection\Listener;
 class Svg2png
 {
     /**
+     * @return bool
+     */
+    public static function isSvBrowserDetectionActive() : bool
+    {
+        return \array_key_exists(
+            'SV/BrowserDetection',
+            \XF::app()->container('addon.cache')
+        );
+    }
+
+    /**
      * Returns if all the requirements for converting SVG to PNG pass.
      *
      * @return bool
@@ -49,8 +60,7 @@ class Svg2png
      */
     public static function requiresConvertingSvg2Png() : bool
     {
-        $addOns = \XF::app()->container('addon.cache');
-        if (!\array_key_exists('SV/BrowserDetection', $addOns))
+        if (!static::isSvBrowserDetectionActive())
         {
             return false;
         }

@@ -1,6 +1,6 @@
 {
-    "edit_format": "onoff",
-    "edit_format_params": "",
+    "edit_format": "callback",
+    "edit_format_params": "SV\\SvgTemplate\\Option\\RenderSvgAsPng::renderOption",
     "data_type": "boolean",
     "sub_options": [],
     "validation_class": "",
