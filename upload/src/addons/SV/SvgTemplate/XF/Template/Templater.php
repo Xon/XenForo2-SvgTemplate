@@ -11,6 +11,7 @@ use SV\SvgTemplate\Helper\Svg2png;
 use SV\SvgTemplate\XF\Template\Exception\UnsupportedExtensionProvidedException;
 use XF\App;
 use XF\Language;
+use XF\Mvc\Reply\AbstractReply;
 
 /**
  * Extends \XF\Template\Templater
@@ -18,11 +19,44 @@ use XF\Language;
 class Templater extends XFCP_Templater
 {
     public $automaticSvgUrlWriting = true;
+    public $svPngSupportEnabled = false;
 
     public function __construct(App $app, Language $language, $compiledPath)
     {
         parent::__construct($app, $language, $compiledPath);
         Globals::$templater = $this;
+        $this->svPngSupportEnabled = Svg2png::supportForSvg2PngEnabled();
+    }
+
+    protected function injectSvgArgs(array &$xf)
+    {
+        $xf['svg'] = [
+            'enabled' => true,
+            'as' => [
+                'png' => $this->svPngSupportEnabled,
+            ]
+        ];
+    }
+
+    public function addDefaultParams(array $params)
+    {
+        $xf = $params['xf'] ?? null;
+        if ($xf !== null)
+        {
+            $this->injectSvgArgs($xf);
+        }
+
+        parent::addDefaultParams($params);
+    }
+
+    public function addDefaultParam($name, $value)
+    {
+        if ($name === 'xf' && is_array($value))
+        {
+            $this->injectSvgArgs($value);
+        }
+
+        parent::addDefaultParam($name, $value);
     }
 
     public function addDefaultHandlers()
@@ -38,6 +72,7 @@ class Templater extends XFCP_Templater
         }
 
         $this->addFunction('getsvgurl', $callable);
+        $this->addFunction('getsvgurlas', [$this, 'fnGetSvgUrlAs']);
     }
 
 
@@ -48,7 +83,24 @@ class Templater extends XFCP_Templater
      * @param bool                   $includeValidation
      * @return string
      */
+    public function fnGetSvgUrlAs($templater, &$escape, $template, $extension, $includeValidation = false)
+    {
+        return $this->getSvgUrlInternal($templater, $escape, $template, $includeValidation, $extension);
+    }
+
+    /**
+     * @param \XF\Template\Templater $templater
+     * @param string                 $escape
+     * @param string                 $template
+     * @param bool                   $includeValidation
+     * @return string
+     */
     public function fnGetSvgUrl($templater, &$escape, $template, $includeValidation = false)
+    {
+        return $this->getSvgUrlInternal($templater, $escape, $template, $includeValidation);
+    }
+
+    protected function getSvgUrlInternal($templater, &$escape, $template, $includeValidation = false, $forceExtension = '')
     {
         if (!$template)
         {
@@ -57,16 +109,32 @@ class Templater extends XFCP_Templater
 
         $parts = \pathinfo($template);
         $extension = $parts['extension'];
-
-        $supportedExtensions = ['svg', 'png'];
         $hasExtension = !empty($extension);
-        $finalExtension = $this->automaticSvgUrlWriting && Svg2png::requiresConvertingSvg2Png() ? 'png' : 'svg';
+
+        $supportedExtensions = $this->svPngSupportEnabled ? ['svg', 'png'] : ['svg'];
+        if ($forceExtension)
+        {
+            if (!\in_array($forceExtension, $supportedExtensions, true))
+            {
+                return '';
+            }
+            $finalExtension = $forceExtension;
+        }
+        else
+        {
+            $finalExtension = $this->automaticSvgUrlWriting && Svg2png::requiresConvertingSvg2Png() ? 'png' : 'svg';
+        }
 
         if (
             ($hasExtension && !\in_array($extension, $supportedExtensions, true)) // unsupported extension
             || (!empty($parts['dirname']) && $parts['dirname'] !== '.') // contains path info
         )
         {
+            if ($forceExtension)
+            {
+                return '';
+            }
+
             throw new UnsupportedExtensionProvidedException($template);
         }
 

@@ -56,11 +56,6 @@ class Svg2png
      */
     public static function requiresConvertingSvg2Png() : bool
     {
-        if (!static::supportForSvg2PngEnabled())
-        {
-            return false;
-        }
-
         $mobileDetect = Listener::getMobileDetection();
         return $mobileDetect->isMobile() || $mobileDetect->isTablet();
     }
