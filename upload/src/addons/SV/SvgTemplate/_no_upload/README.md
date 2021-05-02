@@ -18,6 +18,43 @@ Otherwise
 svg.php?svg=<templateName>&s=<style_id>&l=<langauge_id>&d=<style_last_modified>
 ```
 
+## Conditional rendering SVGs to PNG (for CSS/LESS)
+
+
+An example of conditional CSS to use the png over the svg for mobile clients
+```
+.mod_interrupt--svg.mod_interrupt
+{
+    &--stop
+    {
+        &:before
+        {
+          content: url({{ getSvgUrl('sv_bbcode_modinterrupt_stop.svg') }}) !important;
+        }
+        <xf:if is="$xf.svg.as.png">
+        .is-tablet &:before,
+        .is-mobile &:before
+        {
+          content: url({{ getSvgUrlAs('sv_bbcode_modinterrupt_stop.svg', 'png') }}) !important;
+        }
+        </xf:if>
+    }
+}
+```
+
+Explicit usage in templates;
+```xml
+<xf:if is="$xf.svg.enabled">
+    <xf:if is="$xf.svg.as.png and $xf.mobileDetect and $xf.mobileDetect.isMobile()">
+        <img src="{{ getSvgUrlAs('example.svg', 'png') }}"/>
+    <xf:else />
+        <img src="{{ getSvgUrlAs('example.svg', 'svg') }}"/>
+    </xf:if>
+<xf:else />
+    <i class="fa fa-stop" />
+</xf:if>
+```
+
 ## XenForo 2 routing integration
 
 While webserver rewrite rules are recommended, this add-on supports extending XenForo's routing system to provide zero-configuration support for SVG Templates
