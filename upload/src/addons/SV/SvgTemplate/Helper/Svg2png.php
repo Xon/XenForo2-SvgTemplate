@@ -16,15 +16,8 @@ class Svg2png
      */
     public static function supportForSvg2PngEnabled() : bool
     {
-        $app = \XF::app();
-        $renderSvgAsPng = $app->options()->svSvgTemplate_renderSvgAsPng ?? false;
+        $renderSvgAsPng = \XF::app()->options()->svSvgTemplate_renderSvgAsPng ?? false;
         if (!$renderSvgAsPng)
-        {
-            return false;
-        }
-
-        $addOns = $app->container('addon.cache');
-        if (!\array_key_exists('SV/BrowserDetection', $addOns))
         {
             return false;
         }
@@ -56,6 +49,12 @@ class Svg2png
      */
     public static function requiresConvertingSvg2Png() : bool
     {
+        $addOns = \XF::app()->container('addon.cache');
+        if (!\array_key_exists('SV/BrowserDetection', $addOns))
+        {
+            return false;
+        }
+
         $mobileDetect = Listener::getMobileDetection();
         return $mobileDetect->isMobile() || $mobileDetect->isTablet();
     }
