@@ -48,6 +48,15 @@ class svgRenderer extends CssRenderer
         $this->templater->automaticSvgUrlWriting = false;
     }
 
+    protected function getRenderParams()
+    {
+        $params = parent::getRenderParams();
+
+        $params['xf'] = $this->templater->getDefaultParam('xf');
+
+        return $params;
+    }
+
     public function isRenderingPng(): bool
     {
         return $this->isRenderingPng;

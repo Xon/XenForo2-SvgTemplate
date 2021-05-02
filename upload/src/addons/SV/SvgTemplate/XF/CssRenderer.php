@@ -23,4 +23,13 @@ class CssRenderer extends XFCP_CssRenderer
         $this->templater = $templater;
         $this->templater->automaticSvgUrlWriting = false;
     }
+
+    protected function getRenderParams()
+    {
+        $params = parent::getRenderParams();
+
+        $params['xf'] = $this->templater->getDefaultParam('xf');
+
+        return $params;
+    }
 }

@@ -58,6 +58,11 @@ class Templater extends XFCP_Templater
         parent::addDefaultParam($name, $value);
     }
 
+    public function getDefaultParam($name)
+    {
+        return $this->defaultParams[$name] ?? null;
+    }
+
     public function addDefaultHandlers()
     {
         parent::addDefaultHandlers();
