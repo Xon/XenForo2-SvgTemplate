@@ -119,7 +119,7 @@ class svgWriter extends CssWriter
                 {
                     $im = new \Imagick();
                     $im->setBackgroundColor(new \ImagickPixel('transparent'));
-                    $im->readImageBlob($output);
+                    $im->readImageBlob('<?xml version="1.0" encoding="UTF-8" standalone="no" ?>' . $output);
                     $im->setImageFormat('png');
                     $img = $im->getImageBlob();
                     $im->clear();
