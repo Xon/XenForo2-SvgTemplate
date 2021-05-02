@@ -15,6 +15,7 @@
     },
     "require-soft": {
         "php-ext/imagick": ["*", "PHP ImageMagick Extension"],
+        "SV/RedisCache" : [2000000, "Redis Cache v2.0.0"],
         "SV/BrowserDetection": [2010000, "Browser Detection v2.1.0+"]
     },
     "icon": ""
