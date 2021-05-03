@@ -20,13 +20,60 @@ svg.php?svg=<templateName>&s=<style_id>&l=<langauge_id>&d=<style_last_modified>
 
 # Render to PNG
 
-This requires imagick with SVG support, and may have odd limitations.
+Rendering SVGs to PNGs requires external support, and depending on OS this may result in odd limitations or poor rendering.
+
+## php-imagick support
 
 Ubuntu (using https://launchpad.net/~ondrej/+archive/ubuntu/php PPA);
 ```
 sudo apt install php7.4-imagick libmagickcore-6.q16-3-extra
 sudo systemctl restart php7.4-fpm
 ```
+Note; some distro's require libmagickcore-6.q16-3-extra to be installed to enable SVG support.
+
+If PNG rendering looks corrupted or wrong, attempt to use the CLI option, and a different conversation tool
+
+## CLI support
+
+This is a generic escape hatch to plug in arbitrary png conversion, using `proc_open` in php.
+
+Configure `Render using proc_open` option with;
+```
+<CLI-binary> {destFile} {sourceFile}
+```
+{sourceFile} is the source SVG written as a temp file
+{destFile} is the destination PNG file as a temp file
+
+Alternatively input/output can be done via pipes
+
+Note; template names are only alpha-numeric strings, which is enforced by validation before the CLI option is called
+
+### Librsvg CLI support
+
+```
+sudo apt install librsvg2-bin
+```
+
+Configure `Render using exec` with;
+```
+rsvg-convert --background-color=transparent --format=png --output={destFile} {sourceFile}
+```
+Untick "use pipes"
+
+### Inkscape CLI support
+
+Note; use `snap` as otherwise it is likely to have too old an instance!
+```
+sudo snap install inkscape
+```
+
+Configure `Render using exec` with;
+```
+inkscape --export-type=png -p
+```
+Tick "use pipes"
+
+# Features
 
 ## Conditional rendering SVGs to PNG (for CSS/LESS)
 

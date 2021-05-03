@@ -5,6 +5,7 @@
 
 namespace SV\SvgTemplate;
 
+use SV\SvgTemplate\Repository\Svg as SvgRepo;
 use XF\App as BaseApp;
 use XF\CssWriter;
 use XF\Http\ResponseStream;
@@ -117,13 +118,9 @@ class svgWriter extends CssWriter
 
                 if (!$img)
                 {
-                    $im = new \Imagick();
-                    $im->setBackgroundColor(new \ImagickPixel('transparent'));
-                    $im->readImageBlob('<?xml version="1.0" encoding="UTF-8" standalone="no" ?>' . $output);
-                    $im->setImageFormat('png');
-                    $img = $im->getImageBlob();
-                    $im->clear();
-                    $im->destroy();
+                    /** @var SvgRepo $svgRepo */
+                    $svgRepo = \XF::repository('SV\SvgTemplate:Svg');
+                    $img = $svgRepo->convertSvg2Png($output);
 
                     if ($cacheObj)
                     {
