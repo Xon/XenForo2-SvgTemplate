@@ -2,7 +2,7 @@
 
 namespace SV\SvgTemplate\Option;
 
-use SV\SvgTemplate\Helper\Svg2png;
+use SV\SvgTemplate\Repository\Svg as SvgRepo;
 use XF\Entity\Option as OptionEntity;
 use SV\SvgTemplate\XF\Entity\Option as ExtendedOptionEntity;
 use XF\Option\AbstractOption;
@@ -17,10 +17,14 @@ class RenderSvgAsPng extends AbstractOption
         return 'admin:option_template_' . $option->option_id;
     }
 
+    /** @noinspection PhpUnusedParameterInspection */
     protected static function getOptionTemplateParams(OptionEntity $option) : array
     {
+        /** @var SvgRepo $svgRepo */
+        $svgRepo = \XF::repository('SV\SvgTemplate:Svg');
+
         $params = [
-            'browserDetectionStatus' => Svg2png::isSvBrowserDetectionActive(),
+            'browserDetectionStatus' => $svgRepo->isSvBrowserDetectionActive(),
             'imagickStatus' => \extension_loaded('imagick'),
             'imagickSvgFormatStatus' => false,
             'imagickPngFormatStatus' => false

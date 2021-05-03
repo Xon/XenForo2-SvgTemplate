@@ -1,18 +1,16 @@
 <?php
 
-namespace SV\SvgTemplate\Helper;
+namespace SV\SvgTemplate\Repository;
 
 use SV\BrowserDetection\Listener;
+use XF\Mvc\Entity\Repository;
 
-/**
- * @since 2.3.0 rc1
- */
-class Svg2png
+class Svg extends Repository
 {
     /**
      * @return bool
      */
-    public static function isSvBrowserDetectionActive() : bool
+    public function isSvBrowserDetectionActive() : bool
     {
         return \array_key_exists(
             'SV/BrowserDetection',
@@ -25,7 +23,7 @@ class Svg2png
      *
      * @return bool
      */
-    public static function supportForSvg2PngEnabled() : bool
+    public function isSvg2PngEnabled() : bool
     {
         $renderSvgAsPng = \XF::app()->options()->svSvgTemplate_renderSvgAsPng ?? false;
         if (!$renderSvgAsPng)
@@ -58,9 +56,9 @@ class Svg2png
      *
      * @throws \Exception
      */
-    public static function requiresConvertingSvg2Png() : bool
+    public function requiresConvertingSvg2Png() : bool
     {
-        if (!static::isSvBrowserDetectionActive())
+        if (!$this->isSvBrowserDetectionActive())
         {
             return false;
         }

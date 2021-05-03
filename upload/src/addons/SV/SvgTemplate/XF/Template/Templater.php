@@ -7,11 +7,9 @@
 namespace SV\SvgTemplate\XF\Template;
 
 use SV\SvgTemplate\Globals;
-use SV\SvgTemplate\Helper\Svg2png;
 use SV\SvgTemplate\XF\Template\Exception\UnsupportedExtensionProvidedException;
 use XF\App;
 use XF\Language;
-use XF\Mvc\Reply\AbstractReply;
 
 /**
  * Extends \XF\Template\Templater
@@ -21,11 +19,15 @@ class Templater extends XFCP_Templater
     public $automaticSvgUrlWriting = true;
     public $svPngSupportEnabled = false;
 
+    /** @var \SV\SvgTemplate\Repository\Svg */
+    private $svSvgRepo;
+
     public function __construct(App $app, Language $language, $compiledPath)
     {
         parent::__construct($app, $language, $compiledPath);
         Globals::$templater = $this;
-        $this->svPngSupportEnabled = Svg2png::supportForSvg2PngEnabled();
+        $this->svSvgRepo = $this->app->repository('SV\SvgTemplate:Svg');
+        $this->svPngSupportEnabled = $this->svSvgRepo->isSvg2PngEnabled();
     }
 
     protected function injectSvgArgs(array &$xf)
@@ -126,7 +128,7 @@ class Templater extends XFCP_Templater
         }
         else
         {
-            $finalExtension = $this->automaticSvgUrlWriting && Svg2png::requiresConvertingSvg2Png() ? 'png' : 'svg';
+            $finalExtension = $this->automaticSvgUrlWriting && $this->svSvgRepo->requiresConvertingSvg2Png() ? 'png' : 'svg';
         }
 
         if (

@@ -152,6 +152,7 @@ class svgWriter extends CssWriter
         return $response;
     }
 
+    /** @noinspection PhpUnnecessaryLocalVariableInspection */
     public function get304Response()
     {
         $response = parent::get304Response();
