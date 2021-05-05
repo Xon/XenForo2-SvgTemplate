@@ -1,0 +1,3 @@
+<strong>Imagick:</strong> {imagick_status}<br />
+<strong>Imagick SVG format support:</strong> {imagick_svg_format_status}<br />
+<strong>Imagick PNG format support:</strong> {imagick_png_format_status}

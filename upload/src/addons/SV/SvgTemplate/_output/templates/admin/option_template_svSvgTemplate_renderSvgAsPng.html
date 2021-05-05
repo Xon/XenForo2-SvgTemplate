@@ -1,11 +1,48 @@
-<xf:checkboxrow html="{$listedHtml}"
-				rowclass="{$rowClass}"
-				hint="{$hintHtml}"
-				explain="{{ phrase('option_explain.svSvgTemplate_renderSvgAsPng', {
-					'browser_detection_status': $browserDetectionStatus ? phrase('yes') : phrase('no'),
+<xf:radiorow html="{$listedHtml}"
+			 rowclass="{$rowClass}"
+			 hint="{$hintHtml}"
+			 label="{$option.title}"
+			 name="{$inputName}[type]" 
+			 value="{{ $option.option_value.type ?: '' }}" 
+			 explain="{{ phrase('option_explain.svSvgTemplate_renderSvgAsPng', {
+					  'browser_detection_status': $browserDetectionStatus ? phrase('yes') : phrase('no')
+					  })|raw }}"
+				>
+	<xf:option value=""
+			   label="{{ phrase('none') }}"
+			   />
+	<xf:option value="imagick"
+			   label="{{ phrase('svSvgTemplate_renderSvgAsPng_imagick') }}" 
+			   hint="{{ phrase('svSvgTemplate_renderSvgAsPng_imagick_hint', {
 					'imagick_status': $imagickStatus ? phrase('yes') : phrase('no'),
 					'imagick_svg_format_status': $imagickSvgFormatStatus ? phrase('yes') : phrase('no'),
 					'imagick_png_format_status': $imagickPngFormatStatus ? phrase('yes') : phrase('no')
-				})|raw }}">
-	<xf:option name="{$inputName}" selected="{$option.option_value}" label="{$option.title}" />
-</xf:checkboxrow>
+				})|raw }}"
+			   />
+	<xf:option value="cli"
+			   label="{{ phrase('svSvgTemplate_renderSvgAsPng_cli') }}" 
+			   hint="{{ phrase('svSvgTemplate_renderSvgAsPng_cli_hint', {
+					'php_call_system_status': $systemCallStatus ? phrase('yes') : phrase('no')
+				})|raw }}"
+			   >
+		<xf:dependent>
+			<xf:textbox name="{$inputName}[cli]" 
+						value="{$option.option_value.cli}" 
+						placeholder="{{ phrase('svSvgTemplate_renderSvgAsPng_cli_placeholder') }}"
+						/>
+		</xf:dependent>
+	</xf:option>
+	<xf:option value="cli-pipe"
+			   label="{{ phrase('svSvgTemplate_renderSvgAsPng_cli_pipe') }}" 
+			   hint="{{ phrase('svSvgTemplate_renderSvgAsPng_cli_pipe_hint', {
+					'php_call_proc_open_status': $procOpenCallStatus ? phrase('yes') : phrase('no')
+				})|raw }}"
+			   >
+		<xf:dependent>
+			<xf:textbox name="{$inputName}[cli_pipe]" 
+						value="{$option.option_value.cli_pipe}" 
+						placeholder="{{ phrase('svSvgTemplate_renderSvgAsPng_cli_pipe_placeholder') }}"
+						/>
+		</xf:dependent>
+	</xf:option>
+</xf:radiorow>

@@ -27,28 +27,21 @@ class Svg extends Repository
      */
     public function isSvg2PngEnabled() : bool
     {
-        $renderSvgAsPng = \XF::app()->options()->svSvgTemplate_renderSvgAsPng ?? false;
-        if (!$renderSvgAsPng)
+        $renderSvgAsPng = $this->app()->options()->svSvgTemplate_renderSvgAsPng ?? [];
+        $conversationMethod = $renderSvgAsPng['type'] ?? '';
+        switch($conversationMethod)
         {
-            return false;
+            case 'imagick':
+                return $this->convertSvg2PngImagickEnabled();
+            case 'cli':
+                $command = trim($renderSvgAsPng['cli_pipe'] ?? '');
+                return $this->convertSvg2PngCliEnabled($command);
+            case 'cli-pipe':
+                $command = trim($renderSvgAsPng['cli_pipe'] ?? '');
+                return $this->convertSvg2PngCliPipeEnabled($command);
+            default:
+                return false;
         }
-
-        if (!\extension_loaded('imagick'))
-        {
-            return false;
-        }
-
-        if (!\Imagick::queryFormats('SVG'))
-        {
-            return false;
-        }
-
-        if (!\Imagick::queryFormats('PNG'))
-        {
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -76,21 +69,55 @@ class Svg extends Repository
             return '';
         }
 
-        $options = \XF::app()->options();
-        $conversationMethod = $options->svSvgTemplate_renderSvgAsPng ?? '';
+        $renderSvgAsPng = $this->app()->options()->svSvgTemplate_renderSvgAsPng ?? [];
+        $conversationMethod = $renderSvgAsPng['type'] ?? '';
         switch($conversationMethod)
         {
             case 'imagick':
-                return $this->convertSvg2PngImagick($svg);
+                if ($this->convertSvg2PngImagickEnabled())
+                {
+                    return $this->convertSvg2PngImagick($svg);
+                }
+                break;
             case 'cli':
-                $command = $options->svSvgTemplate_cliCommand ?? '';
-                return $this->convertSvg2PngCli($command, $svg);
+                $command = trim($renderSvgAsPng['cli_pipe'] ?? '');
+                if ($this->convertSvg2PngCliEnabled($command))
+                {
+                    return $this->convertSvg2PngCli($command, $svg);
+                }
+                break;
             case 'cli-pipe':
-                $command = $options->svSvgTemplate_cliCommand ?? '';
-                return $this->convertSvg2PngCliPipe($command, $svg);
+                $command = trim($renderSvgAsPng['cli_pipe'] ?? '');
+                if ($this->convertSvg2PngCliPipeEnabled($command))
+                {
+                    return $this->convertSvg2PngCliPipe($command, $svg);
+                }
+                break;
             default:
                 return '';
         }
+
+        return '';
+    }
+
+    protected function convertSvg2PngImagickEnabled(): bool
+    {
+        if (!\extension_loaded('imagick'))
+        {
+            return false;
+        }
+
+        if (!\Imagick::queryFormats('SVG'))
+        {
+            return false;
+        }
+
+        if (!\Imagick::queryFormats('PNG'))
+        {
+            return false;
+        }
+
+        return true;
     }
 
     protected function convertSvg2PngImagick(string $output): string
@@ -106,13 +133,23 @@ class Svg extends Repository
         return $img;
     }
 
-    protected function convertSvg2PngCli(string $command, string $svg): string
+    protected function convertSvg2PngCliEnabled(string $command): bool
     {
         if (!\strlen($command))
         {
-            return '';
+            return false;
         }
 
+        if (!\is_callable('system'))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function convertSvg2PngCli(string $command, string $svg): string
+    {
         $dir = File::createTempDir();
         $tempSourceFile = $dir . '/file.svg';
         $tempDestFile = $dir . '/file.png';
@@ -132,13 +169,23 @@ class Svg extends Repository
         return is_string($img) ? $img : '';
     }
 
-    protected function convertSvg2PngCliPipe(string $command, string $svg): string
+    protected function convertSvg2PngCliPipeEnabled(string $command): bool
     {
         if (!\strlen($command))
         {
-            return '';
+            return false;
         }
 
+        if (!\is_callable('proc_open'))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function convertSvg2PngCliPipe(string $command, string $svg): string
+    {
         $process = new Process($command);
         $process->setTimeout(null);
         $process->setCommandLine($process->getCommandLine());

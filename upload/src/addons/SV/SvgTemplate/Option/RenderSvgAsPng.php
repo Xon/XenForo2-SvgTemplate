@@ -24,6 +24,8 @@ class RenderSvgAsPng extends AbstractOption
         $svgRepo = \XF::repository('SV\SvgTemplate:Svg');
 
         $params = [
+            'procOpenCallStatus' => \is_callable('proc_open'),
+            'systemCallStatus' => \is_callable('system'),
             'browserDetectionStatus' => $svgRepo->isSvBrowserDetectionActive(),
             'imagickStatus' => \extension_loaded('imagick'),
             'imagickSvgFormatStatus' => false,

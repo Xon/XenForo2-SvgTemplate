@@ -1,0 +1,2 @@
+Invoke a CLI application, and supplying the SVG as {sourceFile} and a destination file as {destFile}<br/>
+<strong>system php call:</strong> {php_call_system_status}

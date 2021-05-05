@@ -1,13 +1,15 @@
 {
     "edit_format": "callback",
     "edit_format_params": "SV\\SvgTemplate\\Option\\RenderSvgAsPng::renderOption",
-    "data_type": "boolean",
-    "sub_options": [],
+    "data_type": "array",
+    "sub_options": [
+        "*"
+    ],
     "validation_class": "",
     "validation_method": "",
     "advanced": false,
-    "default_value": "0",
+    "default_value": "[]",
     "relations": {
-        "svSvgTemplate": 20
+        "svSvgTemplate": 30
     }
 }

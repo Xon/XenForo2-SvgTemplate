@@ -1,0 +1,2 @@
+Invoke a CLI application, and pipe the SVG in as standard input and capture the PNG from standard output<br/>
+<strong>proc_open php call:</strong> {php_call_proc_open_status}
