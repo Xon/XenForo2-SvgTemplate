@@ -20,6 +20,8 @@ use XF\Template\Templater;
  */
 class svgRenderer extends CssRenderer
 {
+    const SVG_CACHE_TIME = 3600; // 1 hour
+
     protected $compactSvg = true;
     protected $echoUncompressedData = false;
     protected $isRenderingPng = false;
@@ -175,7 +177,7 @@ class svgRenderer extends CssRenderer
             'o' => $output ? \gzencode($output, 9) : null,
             'l' => strlen($output),
         ]);
-        $credis->expire($key, 3600);
+        $credis->expire($key, static::SVG_CACHE_TIME);
     }
 
     protected function getIndividualCachedTemplates(array $templates)
