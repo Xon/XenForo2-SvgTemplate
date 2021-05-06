@@ -58,11 +58,15 @@ class RenderSvgAsPng extends AbstractOption
     /**
      * @param mixed        $value
      * @param OptionEntity $option
-     *
-     * @noinspection PhpUnusedParameterInspection
      */
     public static function verifyOption(&$value, \XF\Entity\Option $option)
     {
+        $type = $value['type'] ?? '';
+        if (!$type)
+        {
+            $value = [];
+        }
+
         $oldValue = $option->option_value;
         \XF::runLater(function() use ($oldValue, $option) {
             if ($oldValue != $option->option_value)
@@ -72,5 +76,7 @@ class RenderSvgAsPng extends AbstractOption
                 $styleRepo->updateAllStylesLastModifiedDateLater();
             }
         });
+
+        return true;
     }
 }
