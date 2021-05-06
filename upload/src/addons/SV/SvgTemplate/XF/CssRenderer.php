@@ -31,7 +31,10 @@ class CssRenderer extends XFCP_CssRenderer
     {
         $params = parent::getRenderParams();
 
-        $params['xf'] = $this->templater->getDefaultParam('xf');
+        if (\is_callable([$this->templater, 'getDefaultParam']))
+        {
+            $params['xf'] = $this->templater->getDefaultParam('xf');
+        }
 
         return $params;
     }
