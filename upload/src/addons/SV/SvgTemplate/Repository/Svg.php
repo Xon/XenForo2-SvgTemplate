@@ -60,6 +60,11 @@ class Svg extends Repository
         }
 
         $mobileDetect = Listener::getMobileDetection();
+        if (!$mobileDetect)
+        {
+            return false;
+        }
+
         return $mobileDetect->isMobile() || $mobileDetect->isTablet();
     }
 
