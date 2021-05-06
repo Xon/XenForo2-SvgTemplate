@@ -87,7 +87,7 @@ class svgRenderer extends CssRenderer
                 case 'svg':
                     break;
                 case 'png':
-                    if (!$this->templater->svPngSupportEnabled)
+                    if (!($this->templater->svPngSupportEnabled ?? false))
                     {
                         return [];
                     }
