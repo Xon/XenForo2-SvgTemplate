@@ -3,6 +3,7 @@
 namespace SV\SvgTemplate\Repository;
 
 use SV\BrowserDetection\Listener;
+use SV\SvgTemplate\XF\Template\Exception\UnsupportedExtensionProvidedException;
 use Symfony\Component\Process\Process;
 use XF\Mvc\Entity\Repository;
 use XF\Util\File;
@@ -194,5 +195,74 @@ class Svg extends Repository
         $img = $process->getOutput();
 
         return is_string($img) ? $img : '';
+    }
+
+    public function getSvgUrl(\XF\Template\Templater $templater, &$escape, string $template, bool $pngSupport, bool $autoUrlRewrite, bool $includeValidation, string $forceExtension)
+    {
+        if (!$template)
+        {
+            throw new \LogicException('$templateName is required');
+        }
+
+        $parts = \pathinfo($template);
+        $extension = $parts['extension'];
+        $hasExtension = !empty($extension);
+
+        $supportedExtensions = $pngSupport ? ['svg', 'png'] : ['svg'];
+        if ($forceExtension)
+        {
+            if (!\in_array($forceExtension, $supportedExtensions, true))
+            {
+                return '';
+            }
+            $finalExtension = $forceExtension;
+        }
+        else
+        {
+            $finalExtension = $autoUrlRewrite && $this->requiresConvertingSvg2Png() ? 'png' : 'svg';
+        }
+
+        if (
+            ($hasExtension && !\in_array($extension, $supportedExtensions, true)) // unsupported extension
+            || (!empty($parts['dirname']) && $parts['dirname'] !== '.') // contains path info
+        )
+        {
+            if ($forceExtension)
+            {
+                return '';
+            }
+
+            throw new UnsupportedExtensionProvidedException($template);
+        }
+
+        $template = $parts['filename'] . '.' . $finalExtension;
+
+        $app = \XF::app();
+
+        $useFriendlyUrls = $app->options()->useFriendlyUrls;
+        $style = $templater->getStyle() ?: $this->app()->style();
+        $styleId = $style->getId();
+        $languageId = $templater->getLanguage()->getId();
+        $lastModified = $style->getLastModified();
+
+        if ($useFriendlyUrls)
+        {
+            $url = "data/svg/{$styleId}/{$languageId}/{$lastModified}/{$template}";
+        }
+        else
+        {
+            $url = "svg.php?svg={$template}&s={$styleId}&l={$languageId}&d={$lastModified}";
+        }
+
+        if ($includeValidation)
+        {
+            $validationKey = $templater->getCssValidationKey([$template]);
+            if ($validationKey)
+            {
+                $url .= ($useFriendlyUrls ? '?' : '&') . 'k=' . urlencode($validationKey);
+            }
+        }
+
+        return $templater->fnBaseUrl($templater, $escape, $url, true);
     }
 }

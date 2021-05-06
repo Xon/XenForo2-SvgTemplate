@@ -7,7 +7,6 @@
 namespace SV\SvgTemplate\XF\Template;
 
 use SV\SvgTemplate\Globals;
-use SV\SvgTemplate\XF\Template\Exception\UnsupportedExtensionProvidedException;
 use XF\App;
 use XF\Language;
 
@@ -91,7 +90,7 @@ class Templater extends XFCP_Templater
      */
     public function fnGetSvgUrlAs($templater, &$escape, $template, $extension, $includeValidation = false)
     {
-        return $this->getSvgUrlInternal($templater, $escape, $template, $includeValidation, $extension);
+        return $this->svSvgRepo->getSvgUrl($templater, $escape, $template, $this->svPngSupportEnabled , $this->automaticSvgUrlWriting, $includeValidation, $extension);
     }
 
     /**
@@ -103,75 +102,6 @@ class Templater extends XFCP_Templater
      */
     public function fnGetSvgUrl($templater, &$escape, $template, $includeValidation = false)
     {
-        return $this->getSvgUrlInternal($templater, $escape, $template, $includeValidation);
-    }
-
-    protected function getSvgUrlInternal($templater, &$escape, $template, $includeValidation = false, $forceExtension = '')
-    {
-        if (!$template)
-        {
-            throw new \LogicException('$templateName is required');
-        }
-
-        $parts = \pathinfo($template);
-        $extension = $parts['extension'];
-        $hasExtension = !empty($extension);
-
-        $supportedExtensions = $this->svPngSupportEnabled ? ['svg', 'png'] : ['svg'];
-        if ($forceExtension)
-        {
-            if (!\in_array($forceExtension, $supportedExtensions, true))
-            {
-                return '';
-            }
-            $finalExtension = $forceExtension;
-        }
-        else
-        {
-            $finalExtension = $this->automaticSvgUrlWriting && $this->svSvgRepo->requiresConvertingSvg2Png() ? 'png' : 'svg';
-        }
-
-        if (
-            ($hasExtension && !\in_array($extension, $supportedExtensions, true)) // unsupported extension
-            || (!empty($parts['dirname']) && $parts['dirname'] !== '.') // contains path info
-        )
-        {
-            if ($forceExtension)
-            {
-                return '';
-            }
-
-            throw new UnsupportedExtensionProvidedException($template);
-        }
-
-        $template = $parts['filename'] . '.' . $finalExtension;
-
-        $app = \XF::app();
-
-        $useFriendlyUrls = $app->options()->useFriendlyUrls;
-        $style = $this->getStyle() ?: $this->app->style();
-        $styleId = $style->getId();
-        $languageId = $templater->getLanguage()->getId();
-        $lastModified = $style->getLastModified();
-
-        if ($useFriendlyUrls)
-        {
-            $url = "data/svg/{$styleId}/{$languageId}/{$lastModified}/{$template}";
-        }
-        else
-        {
-            $url = "svg.php?svg={$template}&s={$styleId}&l={$languageId}&d={$lastModified}";
-        }
-
-        if ($includeValidation)
-        {
-            $validationKey = $templater->getCssValidationKey([$template]);
-            if ($validationKey)
-            {
-                $url .= ($useFriendlyUrls ? '?' : '&') . 'k=' . urlencode($validationKey);
-            }
-        }
-
-        return $templater->fnBaseUrl($templater, $escape, $url, true);
+        return $this->svSvgRepo->getSvgUrl($templater, $escape, $template, $this->svPngSupportEnabled , $this->automaticSvgUrlWriting, $includeValidation, '');
     }
 }
