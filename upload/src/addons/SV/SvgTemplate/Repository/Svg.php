@@ -157,8 +157,8 @@ class Svg extends Repository
         \file_put_contents($tempSourceFile, $svg);
 
         $command = \strtr($command, [
-            'destFile' => $tempDestFile,
-            'sourceFile' => $tempSourceFile,
+            '{destFile}' => $tempDestFile,
+            '{sourceFile}' => $tempSourceFile,
         ]);
 
         // dead simple, no real input/output capturing
