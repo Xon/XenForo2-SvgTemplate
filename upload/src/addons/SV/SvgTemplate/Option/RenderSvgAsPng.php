@@ -63,8 +63,14 @@ class RenderSvgAsPng extends AbstractOption
      */
     public static function verifyOption(&$value, \XF\Entity\Option $option)
     {
-        /** @var \XF\Repository\Style $styleRepo */
-        $styleRepo = \XF::repository('XF:Style');
-        $styleRepo->updateAllStylesLastModifiedDateLater();
+        $oldValue = $option->option_value;
+        \XF::runLater(function() use ($oldValue, $option) {
+            if ($oldValue != $option->option_value)
+            {
+                /** @var \XF\Repository\Style $styleRepo */
+                $styleRepo = \XF::repository('XF:Style');
+                $styleRepo->updateAllStylesLastModifiedDateLater();
+            }
+        });
     }
 }
