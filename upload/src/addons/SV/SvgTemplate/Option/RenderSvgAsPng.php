@@ -54,4 +54,17 @@ class RenderSvgAsPng extends AbstractOption
 
         return self::getTemplate($optionTemplate, $option, $htmlParams, $optionParams);
     }
+
+    /**
+     * @param mixed        $value
+     * @param OptionEntity $option
+     *
+     * @noinspection PhpUnusedParameterInspection
+     */
+    public static function verifyOption(&$value, \XF\Entity\Option $option)
+    {
+        /** @var \XF\Repository\Style $styleRepo */
+        $styleRepo = \XF::repository('XF:Style');
+        $styleRepo->updateAllStylesLastModifiedDateLater();
+    }
 }
