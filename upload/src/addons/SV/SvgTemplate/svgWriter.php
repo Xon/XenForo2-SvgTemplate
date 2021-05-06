@@ -13,6 +13,8 @@ use XF\Http\Response;
 
 class svgWriter extends CssWriter
 {
+    const PNG_CACHE_TIME = 3600; // 1 hour
+
     public function run(array $templates, $styleId, $languageId, $validation = null)
     {
         $request = \XF::app()->request();
@@ -124,7 +126,7 @@ class svgWriter extends CssWriter
 
                     if ($cacheObj)
                     {
-                        $cacheObj->save($cacheKey, $img, 3600);
+                        $cacheObj->save($cacheKey, $img, static::PNG_CACHE_TIME);
                     }
                 }
 
