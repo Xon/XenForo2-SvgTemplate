@@ -24,6 +24,8 @@ Rendering SVGs to PNGs requires external support, and depending on OS this may r
 
 ## php-imagick support
 
+It is not recommended to use Imagick if it can be helped!
+
 Ubuntu (using https://launchpad.net/~ondrej/+archive/ubuntu/php PPA);
 ```
 sudo apt install php7.4-imagick libmagickcore-6.q16-3-extra
@@ -31,7 +33,7 @@ sudo systemctl restart php7.4-fpm
 ```
 Note; some distro's require libmagickcore-6.q16-3-extra to be installed to enable SVG support.
 
-If PNG rendering looks corrupted or wrong, attempt to use the CLI option, and a different conversation tool
+Older versions of Imagick have poor SVG support, on top of Imagick's poor security reputation.
 
 ## CLI support
 
@@ -48,17 +50,28 @@ Alternatively input/output can be done via pipes
 
 Note; template names are only alpha-numeric strings, which is enforced by validation before the CLI option is called
 
-### Librsvg CLI support
+### resvg CLI support
+
+Example using [resvg](https://github.com/RazrFalcon/resvg), configure `CLI` command with;
+```
+/usr/local/bin/resvg --quiet {sourceFile} {destFile}
+```
+
+#### Precompiled binary
+Pre-compiled linux x86_64 binary has been made available [here](https://github.com/Xon/resvg/releases/download/v0.14.1/resvg-x86_64-0.14.1.zip).
+Compiled on CentOS 7, works on Ubuntu 18.04/20.04
+
+#### Compiling
+
+Compiling may bind to newer versions of glibc which can cause portability issues
 
 ```
-sudo apt install librsvg2-bin
+curl https://sh.rustup.rs -sSf | sh
+source $HOME/.cargo/env
+cargo install resvg
+cp ~/.cargo/bin/resvg /usr/local/bin/resvg
+chmod +x /usr/local/bin/resvg
 ```
-
-Configure `Render using exec` with;
-```
-rsvg-convert --background-color=transparent --format=png --output={destFile} {sourceFile}
-```
-Untick "use pipes"
 
 ### Inkscape CLI support
 
@@ -67,11 +80,10 @@ Note; use `snap` as otherwise it is likely to have too old an instance!
 sudo snap install inkscape
 ```
 
-Configure `Render using exec` with;
+Configure `CLI PIPE` command with;
 ```
 inkscape --export-type=png -p
 ```
-Tick "use pipes"
 
 # Features
 
