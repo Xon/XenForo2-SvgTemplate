@@ -12,6 +12,7 @@ namespace SV\SvgTemplate\XF
 namespace SV\SvgTemplate\XF\Entity
 {
 	class XFCP_Option extends \XF\Entity\Option {}
+	class XFCP_Template extends \XF\Entity\Template {}
 }
 
 namespace SV\SvgTemplate\XF\Mail

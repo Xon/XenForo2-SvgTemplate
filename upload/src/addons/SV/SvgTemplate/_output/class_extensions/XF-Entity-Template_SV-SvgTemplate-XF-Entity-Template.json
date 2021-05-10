@@ -1,0 +1,6 @@
+{
+    "from_class": "XF\\Entity\\Template",
+    "to_class": "SV\\SvgTemplate\\XF\\Entity\\Template",
+    "execute_order": 10,
+    "active": true
+}
