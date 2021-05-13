@@ -104,4 +104,12 @@ class Templater extends XFCP_Templater
     {
         return $this->svSvgRepo->getSvgUrl($templater, $escape, $template, $this->svPngSupportEnabled , $this->automaticSvgUrlWriting, $includeValidation, '');
     }
+
+    public function svUncacheTemplateData($type, $template)
+    {
+        $languageId = $this->language->getId();
+        $cacheKey = "{$languageId}-{$this->styleId}-{$type}-{$template}";
+
+        unset($this->templateCache[$cacheKey]);
+    }
 }

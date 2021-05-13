@@ -2,6 +2,7 @@
 
 namespace SV\SvgTemplate\XF\Entity;
 
+use SV\SvgTemplate\XF\Template\Compiler;
 use XF\Template\Compiler\Ast as TemplateCompilerAst;
 
 /**
@@ -34,21 +35,68 @@ class Template extends XFCP_Template
      */
     protected function validateTemplateText($template, $forceValid = false, &$ast = null, &$error = null)
     {
-        $isValidated = parent::validateTemplateText($template, $forceValid, $ast, $error);
-
-        if ($isValidated && $this->isSvgTemplateForSv())
+        $app = $this->app();
+        $isSvg = $this->isSvgTemplateForSv();
+        if ($isSvg)
         {
-            $dom = new \DOMDocument();
+            // shim the template compiler, so we don't need to compile the templates multiple times
+            $originalTemplateCompiler = $app->container()->getOriginal('templateCompiler');
+            $app->container()->set('templateCompiler', function() {
+                return new Compiler();
+            });
+        }
+        try
+        {
+            $isValidated = parent::validateTemplateText($template, $forceValid, $ast, $error);
+        }
+        finally
+        {
+            if ($isSvg)
+            {
+                /** @var Compiler $compiler */
+                $compiler = $this->app()->templateCompiler();
+
+                $app->container()->offsetUnset('templateCompiler');
+                $app->container()->set('templateCompiler', $originalTemplateCompiler);
+            }
+        }
+
+
+        if ($isSvg && $isValidated && $this->getOption('test_compile') && $ast)
+        {
+            $code = $compiler->previousCode ?? null;
+            if (!$code)
+            {
+                $compiler = $this->app()->templateCompiler();
+                $code = $compiler->compile($template);
+            }
+
+            /** @var \XF\Repository\User $userRepo */
+            $userRepo = $this->repository('XF:User');
+            $guestUser = $userRepo->getGuestUser();
+            $output = \XF::asVisitor($guestUser, function() use ($code, $app) {
+
+                /** @var \SV\SvgTemplate\svgRenderer $renderer */
+                $rendererClass = $app->extendClass('SV\SvgTemplate\svgRenderer');
+                $renderer = new $rendererClass($app, $app->templater(), null);
+
+                return $renderer->renderTemplateRaw($code);
+            });
 
             $isValidSvg = false;
             $exceptionMsg = \XF::phraseDeferred('svSvgTemplate_unknown_error');
 
             try
             {
-                $dom->loadXML($template);
-                $isValidSvg = $dom->validate();
+                if ($output)
+                {
+                    $dom = new \DOMDocument();
+                    $dom->loadXML('<?xml version="1.0" encoding="UTF-8" standalone="no" ?>' . $output, LIBXML_NOBLANKS | LIBXML_NONET | LIBXML_NSCLEAN | LIBXML_NOXMLDECL);
+                    $output = $dom->saveXML();
+                    $isValidSvg = \is_string($output) && \strlen($output) > 0;
+                }
             }
-            catch (\Exception $exception)
+            catch (\Throwable $exception)
             {
                 $exceptionMsg = $exception->getMessage();
                 $exceptionMsgParts = \explode(': ', $exceptionMsg);

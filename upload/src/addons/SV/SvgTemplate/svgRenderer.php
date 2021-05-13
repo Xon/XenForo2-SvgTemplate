@@ -213,6 +213,35 @@ class svgRenderer extends CssRenderer
         return '';
     }
 
+    public function renderTemplateRaw($templateCode)
+    {
+        $templater = $this->templater;
+        $template = 'SVG-TEMP-COMPILE.SVG';
+
+        $tmpFile = $templater->getTemplateFilePath('public', $template);
+
+        \file_put_contents($tmpFile, "<?php\n" . $templateCode);
+        \XF\Util\Php::invalidateOpcodeCache($tmpFile);
+        try
+        {
+            $output = $templater->renderTemplate('public:' . $template, $this->renderParams, false);
+            $output = \utf8_trim($output);
+            // always do rewrite/optimize, as this enables the less => css parsing in the <style> element
+            if (\strlen($output))
+            {
+                $output = $this->rewriteSvg($template, $output);
+            }
+
+            return $output;
+        }
+        finally
+        {
+            @unlink($tmpFile);
+            \XF\Util\Php::invalidateOpcodeCache($tmpFile);
+            $templater->svUncacheTemplateData('public', $template);
+        }
+    }
+
     public function renderTemplate($template, &$error = null, &$updateCache = true)
     {
         if (!$this->templater->isKnownTemplate($template))
@@ -345,9 +374,7 @@ class svgRenderer extends CssRenderer
         }
         catch (\Exception $e)
         {
-            \XF::logException($e);
-            // failed for some reason, return as-is
-            return $svg;
+            throw new UnableToRewriteSvgException($template, 0, $e);
         }
         finally
         {
@@ -384,9 +411,7 @@ class svgRenderer extends CssRenderer
             }
             catch (\Exception $e)
             {
-                \XF::logException($e);
-                // failed for some reason, return as-is
-                return $svg;
+                throw new UnableToRewriteSvgException($template, 0, $e);
             }
 
             $rootElement->insertBefore($doc->createElement('style', $css), $rootElement->lastChild);

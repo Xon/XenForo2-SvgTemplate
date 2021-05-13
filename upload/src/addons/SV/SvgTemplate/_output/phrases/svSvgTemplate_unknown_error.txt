@@ -1,1 +1,1 @@
-Unknown error
+Unknown error, check error log for details
