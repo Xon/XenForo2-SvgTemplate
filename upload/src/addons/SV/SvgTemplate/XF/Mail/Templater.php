@@ -51,7 +51,7 @@ class Templater extends XFCP_Templater
 
     public function addDefaultParam($name, $value)
     {
-        if ($name === 'xf' && is_array($value))
+        if ($name === 'xf' && \is_array($value))
         {
             $this->injectSvgArgs($value);
         }

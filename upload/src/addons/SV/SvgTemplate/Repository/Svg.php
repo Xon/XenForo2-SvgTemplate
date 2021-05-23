@@ -172,7 +172,7 @@ class Svg extends Repository
 
         $img = @\file_get_contents($tempDestFile);
 
-        return is_string($img) ? $img : '';
+        return \is_string($img) ? $img : '';
     }
 
     protected function convertSvg2PngCliPipeEnabled(string $command): bool

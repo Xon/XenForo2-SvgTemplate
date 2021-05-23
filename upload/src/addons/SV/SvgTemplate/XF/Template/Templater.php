@@ -51,7 +51,7 @@ class Templater extends XFCP_Templater
 
     public function addDefaultParam($name, $value)
     {
-        if ($name === 'xf' && is_array($value))
+        if ($name === 'xf' && \is_array($value))
         {
             $this->injectSvgArgs($value);
         }
@@ -69,7 +69,7 @@ class Templater extends XFCP_Templater
         parent::addDefaultHandlers();
 
         $callable = [$this, 'fnGetSvgUrl'];
-        $hasFromCallable = is_callable('\Closure::fromCallable');
+        $hasFromCallable = \is_callable('\Closure::fromCallable');
         if ($hasFromCallable)
         {
             /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */

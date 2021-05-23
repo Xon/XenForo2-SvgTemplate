@@ -116,7 +116,7 @@ class svgRenderer extends CssRenderer
 
         $key = $cache->getNamespacedId($this->getFinalCacheKey($templates) . '_gz');
         $data = $credis->hGetAll($key);
-        if (!is_array($data))
+        if (!\is_array($data))
         {
             return '';
         }
@@ -179,7 +179,7 @@ class svgRenderer extends CssRenderer
         $key = $cache->getNamespacedId($this->getFinalCacheKey($templates) . '_gz');
         $credis->hMSet($key, [
             'o' => $output ? \gzencode($output, 9) : null,
-            'l' => strlen($output),
+            'l' => \strlen($output),
         ]);
         $credis->expire($key, static::SVG_CACHE_TIME);
     }
@@ -204,7 +204,7 @@ class svgRenderer extends CssRenderer
         else
         {
             $rendered = $this->renderTemplate($template, $error);
-            if (is_string($rendered))
+            if (\is_string($rendered))
             {
                 return $rendered;
             }

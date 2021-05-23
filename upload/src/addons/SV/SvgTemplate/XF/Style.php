@@ -71,7 +71,7 @@ class Style extends XFCP_Style
 
         foreach($this->properties as &$property)
         {
-            if (is_array($property))
+            if (\is_array($property))
             {
                 foreach($property as &$component)
                 {
