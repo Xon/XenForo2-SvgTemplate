@@ -118,11 +118,15 @@ class svgRenderer extends CssRenderer
         $data = $credis->hGetAll($key);
         if (empty($data))
         {
-            return false;
+            return '';
         }
 
-        $output = $data['o']; // gzencoded
-        $length = $data['l'];
+        $output = $data['o'] ?? null; // gzencoded
+        $length = $data['l'] ?? null;
+        if ($output === null || $length === null)
+        {
+            return '';
+        }
 
         if ($this->echoUncompressedData)
         {
