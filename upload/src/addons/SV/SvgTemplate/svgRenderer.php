@@ -116,7 +116,7 @@ class svgRenderer extends CssRenderer
 
         $key = $cache->getNamespacedId($this->getFinalCacheKey($templates) . '_gz');
         $data = $credis->hGetAll($key);
-        if (empty($data))
+        if (!is_array($data))
         {
             return '';
         }
