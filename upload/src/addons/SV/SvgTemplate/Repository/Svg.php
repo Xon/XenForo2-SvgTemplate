@@ -224,7 +224,7 @@ class Svg extends Repository
         }
         else
         {
-            $finalExtension = $autoUrlRewrite && $this->requiresConvertingSvg2Png() ? 'png' : 'svg';
+            $finalExtension = ($pngSupport && $autoUrlRewrite && $this->requiresConvertingSvg2Png()) ? 'png' : 'svg';
         }
 
         if (
