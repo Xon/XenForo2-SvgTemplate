@@ -199,7 +199,7 @@ class Svg extends Repository
         $process->run();
         $img = $process->getOutput();
 
-        return is_string($img) ? $img : '';
+        return \is_string($img) ? $img : '';
     }
 
     public function getSvgUrl(\XF\Template\Templater $templater, &$escape, string $template, bool $pngSupport, bool $autoUrlRewrite, bool $includeValidation, string $forceExtension)

@@ -174,7 +174,7 @@ class svgRenderer extends CssRenderer
             return;
         }
 
-        $output = strval($output);
+        $output = \strval($output);
 
         $key = $cache->getNamespacedId($this->getFinalCacheKey($templates) . '_gz');
         $credis->hMSet($key, [
