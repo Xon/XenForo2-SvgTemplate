@@ -76,7 +76,7 @@ class Style extends XFCP_Style
                 foreach($property as &$component)
                 {
                     $changes = false;
-                    $data = preg_replace_callback("/{{\s*getSvgUrl\s*\(\s*'([^']+)'\s*\)\s*}}/siux", function ($match) use ($templater, &$changes) {
+                    $data = \preg_replace_callback("/{{\s*getSvgUrl\s*\(\s*'([^']+)'\s*\)\s*}}/siux", function ($match) use ($templater, &$changes) {
                         $output = $templater->fnGetSvgUrl($templater, $escape, $match[1]);
                         $changes = $output !== $match[1];
                         return $output;
@@ -90,7 +90,7 @@ class Style extends XFCP_Style
             else
             {
                 $changes = false;
-                $data = preg_replace_callback("/{{\s*getSvgUrl\s*\(\s*'([^']+)'\s*\)\s*}}/siux", function ($match) use ($templater, &$changes) {
+                $data = \preg_replace_callback("/{{\s*getSvgUrl\s*\(\s*'([^']+)'\s*\)\s*}}/siux", function ($match) use ($templater, &$changes) {
                     $output = $templater->fnGetSvgUrl($templater, $escape, $match[1]);
                     $changes = $output !== $match[1];
                     return $output;

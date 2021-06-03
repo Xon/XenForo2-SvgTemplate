@@ -74,7 +74,7 @@ class svgRenderer extends CssRenderer
         $checkedTemplates = [];
         foreach ($templates AS $template)
         {
-            if (!preg_match('/^([a-z0-9_]+:|)([a-z0-9_]+?)(?:\.(svg|png)|)$/i', $template, $matches))
+            if (!\preg_match('/^([a-z0-9_]+:|)([a-z0-9_]+?)(?:\.(svg|png)|)$/i', $template, $matches))
             {
                 break;
             }
@@ -141,11 +141,11 @@ class svgRenderer extends CssRenderer
     {
         $elements = $this->getCacheKeyElements();
 
-        $templates = array_unique($templates);
-        sort($templates);
+        $templates = \array_unique($templates);
+        \sort($templates);
 
-        return 'xfSvgCache_' . md5(
-                'templates=' . implode(',', $templates)
+        return 'xfSvgCache_' . \md5(
+                'templates=' . \implode(',', $templates)
                 . 'style=' . $elements['style_id']
                 . 'modified=' . $elements['style_last_modified']
                 . 'language=' . $elements['language_id']
@@ -195,7 +195,7 @@ class svgRenderer extends CssRenderer
         $errors = [];
         $this->renderParams = $this->getRenderParams();
 
-        $template = reset($templates);
+        $template = \reset($templates);
 
         if (isset($cached[$template]))
         {
@@ -344,7 +344,7 @@ class svgRenderer extends CssRenderer
                         $nodeText = $node->textContent;
                         if (\strlen($nodeText))
                         {
-                            $nodeText = trim($nodeText);
+                            $nodeText = \trim($nodeText);
                             if (!\strlen($nodeText))
                             {
                                 $node->parentNode->removeChild($node);

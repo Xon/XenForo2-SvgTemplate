@@ -35,10 +35,10 @@ class Svg extends Repository
             case 'imagick':
                 return $this->convertSvg2PngImagickEnabled();
             case 'cli':
-                $command = trim($renderSvgAsPng['cli'] ?? '');
+                $command = \trim($renderSvgAsPng['cli'] ?? '');
                 return $this->convertSvg2PngCliEnabled($command);
             case 'cli-pipe':
-                $command = trim($renderSvgAsPng['cli_pipe'] ?? '');
+                $command = \trim($renderSvgAsPng['cli_pipe'] ?? '');
                 return $this->convertSvg2PngCliPipeEnabled($command);
             default:
                 return false;
@@ -86,14 +86,14 @@ class Svg extends Repository
                 }
                 break;
             case 'cli':
-                $command = trim($renderSvgAsPng['cli'] ?? '');
+                $command = \trim($renderSvgAsPng['cli'] ?? '');
                 if ($this->convertSvg2PngCliEnabled($command))
                 {
                     return $this->convertSvg2PngCli($command, $svg);
                 }
                 break;
             case 'cli-pipe':
-                $command = trim($renderSvgAsPng['cli_pipe'] ?? '');
+                $command = \trim($renderSvgAsPng['cli_pipe'] ?? '');
                 if ($this->convertSvg2PngCliPipeEnabled($command))
                 {
                     return $this->convertSvg2PngCliPipe($command, $svg);
