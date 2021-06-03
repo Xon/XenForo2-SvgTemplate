@@ -268,6 +268,8 @@ class Svg extends Repository
             }
         }
 
-        return $templater->fnBaseUrl($templater, $escape, $url, true);
+        $urlMode = \XF::$versionId < 2020371 ? 'full' : 'canonical';
+
+        return $templater->fnBaseUrl($templater, $escape, $url, $urlMode);
     }
 }
