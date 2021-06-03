@@ -69,7 +69,7 @@ class RenderSvgAsPng extends AbstractOption
 
         $oldValue = $option->option_value;
         \XF::runLater(function() use ($oldValue, $option) {
-            if ($oldValue != $option->option_value)
+            if ($oldValue !== $option->option_value)
             {
                 /** @var \XF\Repository\Style $styleRepo */
                 $styleRepo = \XF::repository('XF:Style');
