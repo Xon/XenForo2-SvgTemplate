@@ -386,6 +386,11 @@ class svgRenderer extends CssRenderer
         }
 
         $rootElement = $doc->documentElement;
+        if (!$rootElement)
+        {
+            // invalid XML
+            throw new UnableToRewriteSvgException($template);
+        }
         $doc->encoding = 'utf-8';
         $doc->formatOutput = false;
 
