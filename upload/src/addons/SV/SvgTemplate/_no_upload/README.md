@@ -4,10 +4,12 @@ Depending on configuration, this add-on requires webserver URL rewrite support!
 
 Allows SVG (Scalable Vector Graphics) images to be stored as templates. This creates a new svg.php file in the XF root directory.
 
-To generate a link to an SVG template (The template must have .svg at the end of the name!) ;
+To generate a link to an SVG template (The template must have .svg at the end of the name!), either in a template or style properties;
 ```
 {{ getSvgUrl('tempate.svg') }}
+{{ getSvgUrlAs('tempate.svg', 'png') }}
 ```
+Note; see information below for 'png' support!
 
 Under Board information, if "Use Full Friendly URLs" (useFriendlyUrls) is set the URL generated is:
 ```
@@ -116,10 +118,10 @@ Explicit usage in templates;
 <xf:if is="$xf.svg.enabled">
     <xf:if is="$xf.svg.as.png and $xf.mobileDetect and $xf.mobileDetect.isMobile()">
         <img src="{{ getSvgUrlAs('example.svg', 'png') }}"/>
-    <xf:else />
+        <xf:else />
         <img src="{{ getSvgUrlAs('example.svg', 'svg') }}"/>
     </xf:if>
-<xf:else />
+    <xf:else />
     <i class="fa fa-stop" />
 </xf:if>
 ```
