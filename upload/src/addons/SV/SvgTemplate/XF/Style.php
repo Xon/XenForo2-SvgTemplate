@@ -64,10 +64,11 @@ class Style extends XFCP_Style
             Globals::$templater = null;
         }
 
-        if (!$templater || !\is_callable([$templater,'fnGetSvgUrl']))
+        if (!$templater || !\is_callable([$templater,'fnGetSvgUrlAs']))
         {
             return;
         }
+        $regex = "/{{\s*getSvgUrl(?:as)?\s*\(\s*'([^']+)'\s*(?:,\s*'([^']+)'\s*)?\)\s*}}/siux";
 
         foreach($this->properties as &$property)
         {
@@ -76,8 +77,9 @@ class Style extends XFCP_Style
                 foreach($property as &$component)
                 {
                     $changes = false;
-                    $data = \preg_replace_callback("/{{\s*getSvgUrl\s*\(\s*'([^']+)'\s*\)\s*}}/siux", function ($match) use ($templater, &$changes) {
-                        $output = $templater->fnGetSvgUrl($templater, $escape, $match[1]);
+                    $data = \preg_replace_callback($regex, function ($match) use ($templater, &$changes) {
+                        $extension = $match[2] ?? '';
+                        $output = $templater->fnGetSvgUrlAs($templater, $escape, $match[1], $extension);
                         $changes = $output !== $match[1];
                         return $output;
                     }, $component);
@@ -90,8 +92,9 @@ class Style extends XFCP_Style
             else
             {
                 $changes = false;
-                $data = \preg_replace_callback("/{{\s*getSvgUrl\s*\(\s*'([^']+)'\s*\)\s*}}/siux", function ($match) use ($templater, &$changes) {
-                    $output = $templater->fnGetSvgUrl($templater, $escape, $match[1]);
+                $data = \preg_replace_callback($regex, function ($match) use ($templater, &$changes) {
+                    $extension = $match[2] ?? '';
+                    $output = $templater->fnGetSvgUrlAs($templater, $escape, $match[1], $extension);
                     $changes = $output !== $match[1];
                     return $output;
                 }, $property);
