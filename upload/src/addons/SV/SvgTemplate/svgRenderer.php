@@ -20,11 +20,17 @@ use XF\Template\Templater;
  */
 class svgRenderer extends CssRenderer
 {
+    /** @var int */
     const SVG_CACHE_TIME = 3600; // 1 hour
 
+    /** @var bool */
     protected $compactSvg = true;
+    /** @var bool */
     protected $echoUncompressedData = false;
+    /** @var bool */
     protected $isRenderingPng = false;
+    /** @var int|null */
+    protected $inputModifiedDate = null;
 
     public function __construct(App $app, Templater $templater, \Doctrine\Common\Cache\CacheProvider $cache = null)
     {
@@ -68,6 +74,19 @@ class svgRenderer extends CssRenderer
         $this->echoUncompressedData = $value;
     }
 
+    /**
+     * @return int|null
+     */
+    public function getInputModifiedDate()
+    {
+        return $this->inputModifiedDate;
+    }
+
+    public function setInputModifiedDate(int $value = null)
+    {
+        $this->inputModifiedDate = $value;
+    }
+
     protected function filterValidTemplates(array $templates)
     {
         // only support rendering 1 svg/png at a time
@@ -95,6 +114,13 @@ class svgRenderer extends CssRenderer
                     break;
                 default:
                     return [];
+            }
+
+            $date = $this->getInputModifiedDate();
+            $styleModifiedDate = $this->style->getLastModified();
+            if ($date !== null && $styleModifiedDate && $date > $styleModifiedDate)
+            {
+                return [];
             }
 
             $type = $matches[1] ?: 'public:';

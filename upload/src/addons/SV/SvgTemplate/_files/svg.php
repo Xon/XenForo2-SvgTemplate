@@ -15,6 +15,7 @@ $input = $request->filter([
 	's' => 'uint',
 	'l' => 'uint',
 	'k' => 'str',
+    'd' => 'uint',
     'style' => 'uint',
     'langauge' => 'uint',
 ]);
@@ -52,7 +53,7 @@ if (!$showDebugOutput && $writer->canSend304($request))
 else
 {
     $svg = $input['svg'] ? [$input['svg']] : [];
-    $response = $writer->run($svg, $input['s'], $input['l'], $input['k']);
+    $response = $writer->run($svg, $input['s'], $input['l'], $input['k'], $input['d']);
     if ($showDebugOutput)
     {
         $response->contentType('text/html', 'utf-8');

@@ -38,7 +38,7 @@ class SvgRenderer extends AbstractController
         else
         {
             $svg = $input['svg'] ? [$input['svg']] : [];
-            $response = $writer->run($svg, $input['s'], $input['l'], $input['k']);
+            $response = $writer->run($svg, $input['s'], $input['l'], $input['k'], $input['d']);
             if ($showDebugOutput)
             {
                 $response->contentType('text/html', 'utf-8');

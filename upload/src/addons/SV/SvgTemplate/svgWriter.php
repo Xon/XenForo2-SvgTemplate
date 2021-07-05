@@ -13,13 +13,19 @@ use XF\Http\Response;
 
 class svgWriter extends CssWriter
 {
+    /** @var int */
     const PNG_CACHE_TIME = 3600; // 1 hour
 
-    public function run(array $templates, $styleId, $languageId, $validation = null)
+    public function run(array $templates, $styleId, $languageId, $validation = null, int $date = null)
     {
         $request = \XF::app()->request();
         /** @var svgRenderer $renderer */
         $renderer = $this->renderer;
+
+        if ($date !== null)
+        {
+            $renderer->setInputModifiedDate($date);
+        }
 
         $showDebugOutput = (\XF::$debugMode && $request->get('_debug'));
         if (!$showDebugOutput && strpos($request->getServer('HTTP_ACCEPT_ENCODING', ''), 'gzip') !== false)

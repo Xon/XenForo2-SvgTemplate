@@ -56,10 +56,10 @@ class Router extends XFCP_Router
                 's' => 'uint',
                 'l' => 'uint',
                 'k' => 'str',
+                'd' => 'uint',
                 // XF1 arguments
                 'style' => 'uint',
                 'langauge' => 'uint',
-                'd' => 'uint',
             ]);
             //XF1 arguments compatibility
             if (!$input['s'] && $input['style'])
