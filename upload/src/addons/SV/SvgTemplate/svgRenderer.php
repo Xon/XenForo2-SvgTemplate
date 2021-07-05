@@ -118,7 +118,7 @@ class svgRenderer extends CssRenderer
 
             $date = $this->getInputModifiedDate();
             $styleModifiedDate = $this->style->getLastModified();
-            if ($date !== null && $styleModifiedDate && $date > $styleModifiedDate)
+            if ($date === 0 || $date !== null && $styleModifiedDate && $date > $styleModifiedDate)
             {
                 return [];
             }
