@@ -2,17 +2,17 @@
     "legacy_addon_id": "SV_SVGTemplate",
     "title": "SVG Template",
     "description": "SVG as Templates",
-    "version_id": 2030500,
-    "version_string": "2.3.5",
+    "version_id": 2040000,
+    "version_string": "2.4.0",
     "dev": "Xon",
     "dev_url": "https://atelieraphelion.com",
     "faq_url": "",
     "support_url": "https://xenforo.com/community/resources/svg-template-by-xon.6647/",
     "extra_urls": [],
     "require": {
-        "XF": [2010070, "XenForo 2.1.0+"],
+        "XF": [2020070, "XenForo 2.2.0+"],
         "php": ["7.0.0", "PHP 7.0.0+"],
-        "SV/StandardLib": [1010000,"Standard Library by Xon v1.1.0+"]
+        "SV/StandardLib": [1110000,"Standard Library by Xon v1.11.0+"]
     },
     "require-soft": {
         "php-ext/imagick": ["*", "PHP ImageMagick Extension"],
