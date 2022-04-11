@@ -8,6 +8,7 @@ namespace SV\SvgTemplate;
 use SV\RedisCache\RawResponseText;
 use SV\RedisCache\Redis;
 use SV\SvgTemplate\Exception\UnableToRewriteSvgException;
+use SV\SvgTemplate\SV\StandardLib\TemplaterHelper;
 use XF\App;
 use XF\CssRenderer;
 use XF\Http\ResponseStream;
@@ -16,7 +17,6 @@ use XF\Template\Templater;
 /**
  * Class svgRenderer
  *
- * @property \SV\SvgTemplate\XF\Template\Templater templater
  */
 class svgRenderer extends CssRenderer
 {
@@ -39,7 +39,7 @@ class svgRenderer extends CssRenderer
             $cache = \XF::app()->cache('css');
         }
         parent::__construct($app, $templater, $cache);
-        $this->templater->automaticSvgUrlWriting = false;
+        $this->templateHelper()->automaticSvgUrlWriting = false;
 
         $this->compactSvg = !\XF::$developmentMode;
         if ($this->useDevModeCache)
@@ -49,17 +49,22 @@ class svgRenderer extends CssRenderer
         }
     }
 
+    protected function templateHelper(): TemplaterHelper
+    {
+        return TemplaterHelper::get($this->templater);
+    }
+
     public function setTemplater(Templater $templater)
     {
         $this->templater = $templater;
-        $this->templater->automaticSvgUrlWriting = false;
+        $this->templateHelper()->automaticSvgUrlWriting = false;
     }
 
     protected function getRenderParams()
     {
         $params = parent::getRenderParams();
 
-        $params['xf'] = $this->templater->getDefaultParam('xf');
+        $params['xf'] = $this->templateHelper()->getDefaultParam('xf');
 
         return $params;
     }
@@ -106,7 +111,7 @@ class svgRenderer extends CssRenderer
                 case 'svg':
                     break;
                 case 'png':
-                    if (!($this->templater->svPngSupportEnabled ?? false))
+                    if (!($this->templater->svTemplateHelper->svPngSupportEnabled ?? false))
                     {
                         return [];
                     }
@@ -272,7 +277,7 @@ class svgRenderer extends CssRenderer
         {
             @unlink($tmpFile);
             \XF\Util\Php::invalidateOpcodeCache($tmpFile);
-            $templater->svUncacheTemplateData('public', $template);
+            $this->templateHelper()->uncacheTemplateData('public', $template);
         }
     }
 

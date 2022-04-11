@@ -1,6 +1,0 @@
-{
-    "from_class": "XF\\Template\\Templater",
-    "to_class": "SV\\SvgTemplate\\XF\\Template\\Templater",
-    "execute_order": 6647,
-    "active": true
-}

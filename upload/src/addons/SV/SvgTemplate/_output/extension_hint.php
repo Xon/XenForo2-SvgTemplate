@@ -3,6 +3,11 @@
 // ################## THIS IS A GENERATED FILE ##################
 // DO NOT EDIT DIRECTLY. EDIT THE CLASS EXTENSIONS IN THE CONTROL PANEL.
 
+namespace SV\SvgTemplate\SV\StandardLib
+{
+	class XFCP_TemplaterHelper extends \SV\StandardLib\TemplaterHelper {}
+}
+
 namespace SV\SvgTemplate\XF
 {
 	class XFCP_CssRenderer extends \XF\CssRenderer {}
@@ -23,9 +28,4 @@ namespace SV\SvgTemplate\XF\Mail
 namespace SV\SvgTemplate\XF\Mvc
 {
 	class XFCP_Router extends \XF\Mvc\Router {}
-}
-
-namespace SV\SvgTemplate\XF\Template
-{
-	class XFCP_Templater extends \XF\Template\Templater {}
 }

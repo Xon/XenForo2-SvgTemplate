@@ -5,36 +5,38 @@
 
 namespace SV\SvgTemplate\XF;
 
+use SV\SvgTemplate\SV\StandardLib\TemplaterHelper;
 use XF\App;
 use XF\Template\Templater;
 
 /**
  * Extends \XF\CssRenderer
  *
- * @property \SV\SvgTemplate\XF\Template\Templater templater
  */
 class CssRenderer extends XFCP_CssRenderer
 {
     public function __construct(App $app, Templater $templater, \Doctrine\Common\Cache\CacheProvider $cache = null)
     {
         parent::__construct($app, $templater, $cache);
-        $this->templater->automaticSvgUrlWriting = false;
+        $this->templateHelper()->automaticSvgUrlWriting = false;
+    }
+
+    protected function templateHelper(): TemplaterHelper
+    {
+        return TemplaterHelper::get($this->templater);
     }
 
     public function setTemplater(Templater $templater)
     {
         $this->templater = $templater;
-        $this->templater->automaticSvgUrlWriting = false;
+        $this->templateHelper()->automaticSvgUrlWriting = false;
     }
 
     protected function getRenderParams()
     {
         $params = parent::getRenderParams();
 
-        if (\is_callable([$this->templater, 'getDefaultParam']))
-        {
-            $params['xf'] = $this->templater->getDefaultParam('xf');
-        }
+        $this->templateHelper()->injectSvgArgs($params['xf']);
 
         return $params;
     }

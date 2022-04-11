@@ -1,7 +1,9 @@
 <?php
+/**
+ * @noinspection PhpMissingReturnTypeInspection
+ */
 
 namespace SV\SvgTemplate\XF\Template;
-
 
 use XF\Template\Compiler\Ast;
 

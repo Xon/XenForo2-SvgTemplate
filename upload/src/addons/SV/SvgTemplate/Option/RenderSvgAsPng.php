@@ -58,8 +58,9 @@ class RenderSvgAsPng extends AbstractOption
     /**
      * @param mixed        $value
      * @param OptionEntity $option
+     * @return bool
      */
-    public static function verifyOption(&$value, \XF\Entity\Option $option)
+    public static function verifyOption(&$value, \XF\Entity\Option $option): bool
     {
         $type = $value['type'] ?? '';
         if (!$type)

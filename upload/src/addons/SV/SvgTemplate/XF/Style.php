@@ -5,7 +5,7 @@
 
 namespace SV\SvgTemplate\XF;
 
-use SV\SvgTemplate\Globals;
+use SV\SvgTemplate\SV\StandardLib\TemplaterHelper;
 
 /**
  * Extends \XF\Style
@@ -52,19 +52,10 @@ class Style extends XFCP_Style
         $this->todoReplacement = false;
 
         $app = \XF::app();
-        $container = $app->container();
-        if ($container->isCached('templater'))
-        {
-            /** @var \SV\SvgTemplate\XF\Template\Templater $templater */
-            $templater = $app->templater();
-        }
-        else
-        {
-            $templater = Globals::$templater;
-            Globals::$templater = null;
-        }
+        $templater = $app->templater();
+        $templaterHelper = TemplaterHelper::get($templater);
 
-        if (!$templater || !\is_callable([$templater,'fnGetSvgUrlAs']))
+        if (!\is_callable([$templaterHelper,'fnGetSvgUrlAs']))
         {
             return;
         }
@@ -77,9 +68,9 @@ class Style extends XFCP_Style
                 foreach($property as &$component)
                 {
                     $changes = false;
-                    $data = \preg_replace_callback($regex, function ($match) use ($templater, &$changes) {
+                    $data = \preg_replace_callback($regex, function ($match) use ($templater, $templaterHelper, &$changes) {
                         $extension = $match[2] ?? '';
-                        $output = $templater->fnGetSvgUrlAs($templater, $escape, $match[1], $extension);
+                        $output = $templaterHelper->fnGetSvgUrlAs($templater, $escape, $match[1], $extension);
                         $changes = $output !== $match[1];
                         return $output;
                     }, $component);
@@ -92,9 +83,9 @@ class Style extends XFCP_Style
             else
             {
                 $changes = false;
-                $data = \preg_replace_callback($regex, function ($match) use ($templater, &$changes) {
+                $data = \preg_replace_callback($regex, function ($match) use ($templater, $templaterHelper, &$changes) {
                     $extension = $match[2] ?? '';
-                    $output = $templater->fnGetSvgUrlAs($templater, $escape, $match[1], $extension);
+                    $output = $templaterHelper->fnGetSvgUrlAs($templater, $escape, $match[1], $extension);
                     $changes = $output !== $match[1];
                     return $output;
                 }, $property);

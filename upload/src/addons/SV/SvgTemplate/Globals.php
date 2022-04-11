@@ -5,10 +5,8 @@ namespace SV\SvgTemplate;
 /**
  * Class Globals
  *
- * @package SV\Threadmarks
+ * @package SV\SvgTemplate
  */
 class Globals
 {
-    /** @var \SV\SvgTemplate\XF\Template\Templater */
-    public static $templater = null;
 }
