@@ -140,7 +140,9 @@ class svgRenderer extends CssRenderer
             return parent::getFinalCachedOutput($templates);
         }
 
-        $key = $cache->getNamespacedId($this->getFinalCacheKey($templates) . '_gz');
+        /** @var Redis $redis */
+        $redis = $cache;
+        $key = $redis->getNamespacedId($this->getFinalCacheKey($templates) . '_gz');
         $data = $credis->hGetAll($key);
         if (!\is_array($data))
         {
@@ -202,7 +204,9 @@ class svgRenderer extends CssRenderer
 
         $output = \strval($output);
 
-        $key = $cache->getNamespacedId($this->getFinalCacheKey($templates) . '_gz');
+        /** @var Redis $redis */
+        $redis = $cache;
+        $key = $redis->getNamespacedId($this->getFinalCacheKey($templates) . '_gz');
         $credis->hMSet($key, [
             'o' => $output ? \gzencode($output, 9) : null,
             'l' => \strlen($output),
