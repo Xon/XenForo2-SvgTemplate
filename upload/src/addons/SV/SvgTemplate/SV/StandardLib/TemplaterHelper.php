@@ -26,6 +26,8 @@ class TemplaterHelper extends XFCP_TemplaterHelper
 
     public function addDefaultHandlers()
     {
+        parent::addDefaultHandlers();
+
         $this->addFunction('getsvgurl', 'fnGetSvgUrl');
         $this->addFunction('getsvgurlas', 'fnGetSvgUrlAs');
     }
