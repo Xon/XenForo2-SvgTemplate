@@ -86,6 +86,11 @@ class svgWriter extends CssWriter
             {
                 $hasOutput = true;
                 $response->compressIfAble(false);
+                try
+                {
+                    @ini_set("zlib.output_compression", "Off");
+                }
+                catch (\Throwable $e) {}
                 if (!$this->isRenderingPng())
                 {
                     $response->header('content-encoding', 'gzip');
