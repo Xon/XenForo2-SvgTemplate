@@ -32,7 +32,7 @@ class TemplaterHelper extends XFCP_TemplaterHelper
         $this->addFunction('getsvgurlas', 'fnGetSvgUrlAs');
     }
 
-    protected function populateTemplaterGlobalData(array &$data, AbstractReply $reply)
+    protected function populateTemplaterGlobalData(array &$data, AbstractReply $reply = null)
     {
         $this->injectSvgArgs($data);
     }
