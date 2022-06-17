@@ -6,6 +6,8 @@
 namespace SV\SvgTemplate\XF;
 
 use SV\StandardLib\TemplaterHelper;
+use SV\SvgTemplate\Globals;
+use SV\SvgTemplate\SV\StandardLib\TemplaterHelper as ExtendedTemplaterHelper;
 
 /**
  * Extends \XF\Style
@@ -53,7 +55,7 @@ class Style extends XFCP_Style
 
         $app = \XF::app();
         $templater = $app->templater();
-        $templaterHelper = TemplaterHelper::get($templater);
+        $templaterHelper = Globals::templateHelper($templater);
 
         if (!\is_callable([$templaterHelper,'fnGetSvgUrlAs']))
         {

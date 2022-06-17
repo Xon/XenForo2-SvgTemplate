@@ -8,7 +8,6 @@ namespace SV\SvgTemplate;
 use SV\RedisCache\RawResponseText;
 use SV\RedisCache\Redis;
 use SV\SvgTemplate\Exception\UnableToRewriteSvgException;
-use SV\StandardLib\TemplaterHelper;
 use XF\App;
 use XF\CssRenderer;
 use XF\Http\ResponseStream;
@@ -39,7 +38,7 @@ class svgRenderer extends CssRenderer
             $cache = \XF::app()->cache('css');
         }
         parent::__construct($app, $templater, $cache);
-        $this->templateHelper()->automaticSvgUrlWriting = false;
+        Globals::templateHelper($this->templater)->automaticSvgUrlWriting = false;
 
         $this->compactSvg = !\XF::$developmentMode;
         if ($this->useDevModeCache)
@@ -49,22 +48,17 @@ class svgRenderer extends CssRenderer
         }
     }
 
-    protected function templateHelper(): TemplaterHelper
-    {
-        return TemplaterHelper::get($this->templater);
-    }
-
     public function setTemplater(Templater $templater)
     {
         $this->templater = $templater;
-        $this->templateHelper()->automaticSvgUrlWriting = false;
+        Globals::templateHelper($this->templater)->automaticSvgUrlWriting = false;
     }
 
     protected function getRenderParams()
     {
         $params = parent::getRenderParams();
 
-        $params['xf'] = $this->templateHelper()->getDefaultParam('xf');
+        $params['xf'] = Globals::templateHelper($this->templater)->getDefaultParam('xf');
 
         return $params;
     }
@@ -275,7 +269,7 @@ class svgRenderer extends CssRenderer
         {
             @unlink($tmpFile);
             \XF\Util\Php::invalidateOpcodeCache($tmpFile);
-            $this->templateHelper()->uncacheTemplateData('public', $template);
+            Globals::templateHelper($this->templater)->uncacheTemplateData('public', $template);
         }
     }
 
