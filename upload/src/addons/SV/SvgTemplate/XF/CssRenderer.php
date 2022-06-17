@@ -5,7 +5,7 @@
 
 namespace SV\SvgTemplate\XF;
 
-use SV\SvgTemplate\SV\StandardLib\TemplaterHelper;
+use SV\StandardLib\TemplaterHelper;
 use XF\App;
 use XF\Template\Templater;
 

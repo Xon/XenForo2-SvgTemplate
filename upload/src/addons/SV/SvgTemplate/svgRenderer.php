@@ -8,7 +8,7 @@ namespace SV\SvgTemplate;
 use SV\RedisCache\RawResponseText;
 use SV\RedisCache\Redis;
 use SV\SvgTemplate\Exception\UnableToRewriteSvgException;
-use SV\SvgTemplate\SV\StandardLib\TemplaterHelper;
+use SV\StandardLib\TemplaterHelper;
 use XF\App;
 use XF\CssRenderer;
 use XF\Http\ResponseStream;
