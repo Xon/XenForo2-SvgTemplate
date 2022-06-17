@@ -145,7 +145,6 @@ class svgRenderer extends CssRenderer
             return parent::getFinalCachedOutput($templates);
         }
 
-        /** @var Redis $redis */
         $redis = $cache;
         $key = $redis->getNamespacedId($this->getFinalCacheKey($templates) . '_gz');
         $data = $credis->hGetAll($key);
@@ -209,7 +208,6 @@ class svgRenderer extends CssRenderer
 
         $output = \strval($output);
 
-        /** @var Redis $redis */
         $redis = $cache;
         $key = $redis->getNamespacedId($this->getFinalCacheKey($templates) . '_gz');
         $credis->hMSet($key, [
@@ -353,7 +351,7 @@ class svgRenderer extends CssRenderer
                     }
                     else if ($compactSvg)
                     {
-                        if (\preg_match("#^(?:sodipodi:|inkscape:|metadata|desc)#usi", $nodeName))
+                        if (\preg_match("#^(?:sodipodi:|inkscape:|metadata|desc)#ui", $nodeName))
                         {
                             $node->parentNode->removeChild($node);
                             $checkChildren = false;
@@ -365,7 +363,7 @@ class svgRenderer extends CssRenderer
                             {
                                 /** @var \DOMAttr $attribute */
                                 $attribute = $attributes->item($i2);
-                                if (\preg_match("#^(?:sodipodi:|inkscape:)#usi", $attribute->name))
+                                if (\preg_match("#^(?:sodipodi:|inkscape:)#ui", $attribute->name))
                                 {
                                     $attributes->removeNamedItem();
                                 }
