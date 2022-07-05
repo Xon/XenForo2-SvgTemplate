@@ -7,6 +7,7 @@ use XF\AddOn\AbstractSetup;
 use XF\AddOn\StepRunnerInstallTrait;
 use XF\AddOn\StepRunnerUninstallTrait;
 use XF\AddOn\StepRunnerUpgradeTrait;
+use function extension_loaded, is_callable;
 
 /**
  * Add-on installation, upgrade, and uninstall routines.
@@ -61,7 +62,7 @@ class Setup extends AbstractSetup
     {
         $this->checkRequirementsTrait($errors, $warnings);
 
-        if (\extension_loaded('imagick'))
+        if (extension_loaded('imagick'))
         {
             if (!\Imagick::queryFormats('PNG'))
             {
@@ -73,7 +74,7 @@ class Setup extends AbstractSetup
             }
         }
 
-        if (!\is_callable('proc_open') || !\is_callable('system'))
+        if (!is_callable('proc_open') || !is_callable('system'))
         {
             $warnings[] = 'proc_open/system is required for converting SVGs to PNGs via CLI';
         }

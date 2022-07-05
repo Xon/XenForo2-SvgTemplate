@@ -7,6 +7,7 @@ namespace SV\SvgTemplate\XF\Entity;
 
 use SV\SvgTemplate\XF\Template\Compiler;
 use XF\Template\Compiler\Ast as TemplateCompilerAst;
+use function strlen, substr, is_string, explode;
 
 /**
  * @since 2.3.0 rc5
@@ -18,12 +19,12 @@ class Template extends XFCP_Template
     protected function isSvgTemplateForSv() : bool
     {
         $templateName = $this->title;
-        $templateNameLength = \strlen($templateName);
+        $templateNameLength = strlen($templateName);
 
         $templateSuffix = static::SVG_TEMPLATE_NAME_SUFFIX_FOR_SV;
-        $templateSuffixLength = \strlen($templateSuffix);
+        $templateSuffixLength = strlen($templateSuffix);
 
-        $suffixFound = \substr($templateName, $templateNameLength - $templateSuffixLength);
+        $suffixFound = substr($templateName, $templateNameLength - $templateSuffixLength);
 
         return $suffixFound === $templateSuffix;
     }
@@ -96,13 +97,13 @@ class Template extends XFCP_Template
                     $dom = new \DOMDocument();
                     $dom->loadXML('<?xml version="1.0" encoding="UTF-8" standalone="no" ?>' . $output, LIBXML_NOBLANKS | LIBXML_NONET | LIBXML_NSCLEAN | LIBXML_NOXMLDECL);
                     $output = $dom->saveXML();
-                    $isValidSvg = \is_string($output) && \strlen($output) > 0;
+                    $isValidSvg = is_string($output) && strlen($output) !== 0;
                 }
             }
             catch (\Throwable $exception)
             {
                 $exceptionMsg = $exception->getMessage();
-                $exceptionMsgParts = \explode(': ', $exceptionMsg);
+                $exceptionMsgParts = explode(': ', $exceptionMsg);
                 $exceptionMsg = $exceptionMsgParts[1];
             }
 

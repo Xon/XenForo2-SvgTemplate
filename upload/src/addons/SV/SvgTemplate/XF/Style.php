@@ -5,9 +5,8 @@
 
 namespace SV\SvgTemplate\XF;
 
-use SV\StandardLib\TemplaterHelper;
 use SV\SvgTemplate\Globals;
-use SV\SvgTemplate\SV\StandardLib\TemplaterHelper as ExtendedTemplaterHelper;
+use function is_callable, is_array, preg_replace_callback;
 
 /**
  * Extends \XF\Style
@@ -57,7 +56,7 @@ class Style extends XFCP_Style
         $templater = $app->templater();
         $templaterHelper = Globals::templateHelper($templater);
 
-        if (!\is_callable([$templaterHelper,'fnGetSvgUrlAs']))
+        if (!is_callable([$templaterHelper,'fnGetSvgUrlAs']))
         {
             return;
         }
@@ -65,12 +64,12 @@ class Style extends XFCP_Style
 
         foreach($this->properties as &$property)
         {
-            if (\is_array($property))
+            if (is_array($property))
             {
                 foreach($property as &$component)
                 {
                     $changes = false;
-                    $data = \preg_replace_callback($regex, function ($match) use ($templater, $templaterHelper, &$changes) {
+                    $data = preg_replace_callback($regex, function ($match) use ($templater, $templaterHelper, &$changes) {
                         $extension = $match[2] ?? '';
                         $output = $templaterHelper->fnGetSvgUrlAs($templater, $escape, $match[1], $extension);
                         $changes = $output !== $match[1];
@@ -85,7 +84,7 @@ class Style extends XFCP_Style
             else
             {
                 $changes = false;
-                $data = \preg_replace_callback($regex, function ($match) use ($templater, $templaterHelper, &$changes) {
+                $data = preg_replace_callback($regex, function ($match) use ($templater, $templaterHelper, &$changes) {
                     $extension = $match[2] ?? '';
                     $output = $templaterHelper->fnGetSvgUrlAs($templater, $escape, $match[1], $extension);
                     $changes = $output !== $match[1];

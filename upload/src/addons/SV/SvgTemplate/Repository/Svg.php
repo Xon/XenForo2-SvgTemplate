@@ -7,6 +7,7 @@ use SV\SvgTemplate\XF\Template\Exception\UnsupportedExtensionProvidedException;
 use Symfony\Component\Process\Process;
 use XF\Mvc\Entity\Repository;
 use XF\Util\File;
+use function array_key_exists, trim, strlen, pathinfo, system, file_get_contents,is_string, is_callable, extension_loaded, strtr, in_array;
 
 class Svg extends Repository
 {
@@ -15,7 +16,7 @@ class Svg extends Repository
      */
     public function isSvBrowserDetectionActive() : bool
     {
-        return \array_key_exists(
+        return array_key_exists(
             'SV/BrowserDetection',
             \XF::app()->container('addon.cache')
         );
@@ -35,10 +36,10 @@ class Svg extends Repository
             case 'imagick':
                 return $this->convertSvg2PngImagickEnabled();
             case 'cli':
-                $command = \trim($renderSvgAsPng['cli'] ?? '');
+                $command = trim($renderSvgAsPng['cli'] ?? '');
                 return $this->convertSvg2PngCliEnabled($command);
             case 'cli-pipe':
-                $command = \trim($renderSvgAsPng['cli_pipe'] ?? '');
+                $command = trim($renderSvgAsPng['cli_pipe'] ?? '');
                 return $this->convertSvg2PngCliPipeEnabled($command);
             default:
                 return false;
@@ -70,7 +71,7 @@ class Svg extends Repository
 
     public function convertSvg2Png(string $svg): string
     {
-        if (!\strlen($svg))
+        if (strlen($svg) === 0)
         {
             return '';
         }
@@ -86,14 +87,14 @@ class Svg extends Repository
                 }
                 break;
             case 'cli':
-                $command = \trim($renderSvgAsPng['cli'] ?? '');
+                $command = trim($renderSvgAsPng['cli'] ?? '');
                 if ($this->convertSvg2PngCliEnabled($command))
                 {
                     return $this->convertSvg2PngCli($command, $svg);
                 }
                 break;
             case 'cli-pipe':
-                $command = \trim($renderSvgAsPng['cli_pipe'] ?? '');
+                $command = trim($renderSvgAsPng['cli_pipe'] ?? '');
                 if ($this->convertSvg2PngCliPipeEnabled($command))
                 {
                     return $this->convertSvg2PngCliPipe($command, $svg);
@@ -108,7 +109,7 @@ class Svg extends Repository
 
     protected function convertSvg2PngImagickEnabled(): bool
     {
-        if (!\extension_loaded('imagick'))
+        if (!extension_loaded('imagick'))
         {
             return false;
         }
@@ -141,12 +142,12 @@ class Svg extends Repository
 
     protected function convertSvg2PngCliEnabled(string $command): bool
     {
-        if (!\strlen($command))
+        if (strlen($command) === 0)
         {
             return false;
         }
 
-        if (!\is_callable('system'))
+        if (!is_callable('system'))
         {
             return false;
         }
@@ -160,29 +161,29 @@ class Svg extends Repository
         $tempSourceFile = $dir . '/file.svg';
         $tempDestFile = $dir . '/file.png';
 
-        \file_put_contents($tempSourceFile, $svg);
+        file_put_contents($tempSourceFile, $svg);
 
-        $command = \strtr($command, [
+        $command = strtr($command, [
             '{destFile}' => $tempDestFile,
             '{sourceFile}' => $tempSourceFile,
         ]);
 
         // dead simple, no real input/output capturing
-        \system($command);
+        system($command);
 
-        $img = @\file_get_contents($tempDestFile);
+        $img = @file_get_contents($tempDestFile);
 
-        return \is_string($img) ? $img : '';
+        return is_string($img) ? $img : '';
     }
 
     protected function convertSvg2PngCliPipeEnabled(string $command): bool
     {
-        if (!\strlen($command))
+        if (strlen($command) === 0)
         {
             return false;
         }
 
-        if (!\is_callable('proc_open'))
+        if (!is_callable('proc_open'))
         {
             return false;
         }
@@ -199,7 +200,7 @@ class Svg extends Repository
         $process->run();
         $img = $process->getOutput();
 
-        return \is_string($img) ? $img : '';
+        return is_string($img) ? $img : '';
     }
 
     public function getSvgUrl(\XF\Template\Templater $templater, &$escape, string $template, bool $pngSupport, bool $autoUrlRewrite, bool $includeValidation, string $forceExtension)
@@ -209,14 +210,14 @@ class Svg extends Repository
             throw new \LogicException('$templateName is required');
         }
 
-        $parts = \pathinfo($template);
+        $parts = pathinfo($template);
         $extension = $parts['extension'];
-        $hasExtension = !empty($extension);
+        $hasExtension = strlen($extension) !== 0;
 
         $supportedExtensions = $pngSupport ? ['svg', 'png'] : ['svg'];
         if ($forceExtension)
         {
-            if (!\in_array($forceExtension, $supportedExtensions, true))
+            if (!in_array($forceExtension, $supportedExtensions, true))
             {
                 return '';
             }
@@ -228,7 +229,7 @@ class Svg extends Repository
         }
 
         if (
-            ($hasExtension && !\in_array($extension, $supportedExtensions, true)) // unsupported extension
+            ($hasExtension && !in_array($extension, $supportedExtensions, true)) // unsupported extension
             || (!empty($parts['dirname']) && $parts['dirname'] !== '.') // contains path info
         )
         {

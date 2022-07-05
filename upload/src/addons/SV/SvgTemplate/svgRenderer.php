@@ -12,6 +12,7 @@ use XF\App;
 use XF\CssRenderer;
 use XF\Http\ResponseStream;
 use XF\Template\Templater;
+use function preg_match, trim, strlen, is_array, reset, is_string, file_put_contents, array_unique, sort, md5, implode, strval, gzencode, unlink, is_callable;
 
 /**
  * Class svgRenderer
@@ -92,7 +93,7 @@ class svgRenderer extends CssRenderer
         $checkedTemplates = [];
         foreach ($templates AS $template)
         {
-            if (!\preg_match('/^([a-z0-9_]+:|)([a-z0-9_]+?)(?:\.(svg|png)|)$/i', $template, $matches))
+            if (!preg_match('/^([a-z\d_]+:|)([a-z\d_]+?)(?:\.(svg|png)|)$/i', $template, $matches))
             {
                 break;
             }
@@ -142,7 +143,7 @@ class svgRenderer extends CssRenderer
         $redis = $cache;
         $key = $redis->getNamespacedId($this->getFinalCacheKey($templates) . '_gz');
         $data = $credis->hGetAll($key);
-        if (!\is_array($data))
+        if (!is_array($data))
         {
             return '';
         }
@@ -167,11 +168,11 @@ class svgRenderer extends CssRenderer
     {
         $elements = $this->getCacheKeyElements();
 
-        $templates = \array_unique($templates);
-        \sort($templates);
+        $templates = array_unique($templates);
+        sort($templates);
 
-        return 'xfSvgCache_' . \md5(
-                'templates=' . \implode(',', $templates)
+        return 'xfSvgCache_' . md5(
+                'templates=' . implode(',', $templates)
                 . 'style=' . $elements['style_id']
                 . 'modified=' . $elements['style_last_modified']
                 . 'language=' . $elements['language_id']
@@ -200,13 +201,13 @@ class svgRenderer extends CssRenderer
             return;
         }
 
-        $output = \strval($output);
+        $output = strval($output);
 
         $redis = $cache;
         $key = $redis->getNamespacedId($this->getFinalCacheKey($templates) . '_gz');
         $credis->hMSet($key, [
-            'o' => $output ? \gzencode($output, 9) : null,
-            'l' => \strlen($output),
+            'o' => $output ? gzencode($output, 9) : null,
+            'l' => strlen($output),
         ]);
         $credis->expire($key, static::SVG_CACHE_TIME);
     }
@@ -222,7 +223,7 @@ class svgRenderer extends CssRenderer
         $errors = [];
         $this->renderParams = $this->getRenderParams();
 
-        $template = \reset($templates);
+        $template = reset($templates);
 
         if (isset($cached[$template]))
         {
@@ -231,7 +232,7 @@ class svgRenderer extends CssRenderer
         else
         {
             $rendered = $this->renderTemplate($template, $error);
-            if (\is_string($rendered))
+            if (is_string($rendered))
             {
                 return $rendered;
             }
@@ -251,14 +252,14 @@ class svgRenderer extends CssRenderer
 
         $tmpFile = $templater->getTemplateFilePath('public', $template);
 
-        \file_put_contents($tmpFile, "<?php\n" . $templateCode);
+        file_put_contents($tmpFile, "<?php\n" . $templateCode);
         \XF\Util\Php::invalidateOpcodeCache($tmpFile);
         try
         {
             $output = $templater->renderTemplate('public:' . $template, $this->renderParams, false);
-            $output = \utf8_trim($output);
+            $output = trim($output);
             // always do rewrite/optimize, as this enables the less => css parsing in the <style> element
-            if (\strlen($output))
+            if (strlen($output) !== 0)
             {
                 $output = $this->rewriteSvg($template, $output);
             }
@@ -286,9 +287,9 @@ class svgRenderer extends CssRenderer
 
             $error = null;
             $output = $this->templater->renderTemplate($template, $this->renderParams, false);
-            $output = \utf8_trim($output);
+            $output = trim($output);
             // always do rewrite/optimize, as this enables the less => css parsing in the <style> element
-            if (\strlen($output))
+            if (strlen($output) !== 0)
             {
                 $output = $this->rewriteSvg($template, $output);
             }
@@ -369,10 +370,10 @@ class svgRenderer extends CssRenderer
                     if ($compactSvg && !$node->hasAttributes())
                     {
                         $nodeText = $node->textContent;
-                        if (\strlen($nodeText))
+                        if (strlen($nodeText) !== 0)
                         {
-                            $nodeText = \trim($nodeText);
-                            if (!\strlen($nodeText))
+                            $nodeText = trim($nodeText);
+                            if (strlen($nodeText) === 0)
                             {
                                 $node->parentNode->removeChild($node);
                                 $checkChildren = false;
@@ -398,7 +399,7 @@ class svgRenderer extends CssRenderer
         // An svg is just plain-text XML. so we can load, prune and save
         $doc = new \DOMDocument();
         $doc->preserveWhiteSpace = false;
-        libxml_use_internal_errors(true);
+        \libxml_use_internal_errors(true);
         try
         {
             $doc->loadXML($svg, LIBXML_NOBLANKS | LIBXML_NONET | LIBXML_NSCLEAN | LIBXML_NOXMLDECL);
@@ -409,7 +410,7 @@ class svgRenderer extends CssRenderer
         }
         finally
         {
-            libxml_clear_errors();
+            \libxml_clear_errors();
         }
 
         $rootElement = $doc->documentElement;
@@ -426,13 +427,13 @@ class svgRenderer extends CssRenderer
         $this->cleanNodeList($rootElement, $styling);
 
         // convert various styling blocks less => css
-        $styling = \utf8_trim($styling);
-        if (\strlen($styling))
+        $styling = trim($styling);
+        if (strlen($styling) !== 0)
         {
             $parser = $this->getFreshLessParser();
 
             $output = $this->prepareLessForRendering($styling);
-            if (\is_callable([$this, 'getLessPrependForPrefix']))
+            if (is_callable([$this, 'getLessPrependForPrefix']))
             {
                 $output = $this->getLessPrepend() . $this->getLessPrependForPrefix($template) . $output;
             }
@@ -454,7 +455,7 @@ class svgRenderer extends CssRenderer
         }
 
         $cleanSvg = $doc->saveXML($rootElement);
-        if (!\strlen($cleanSvg))
+        if (strlen($cleanSvg) === 0)
         {
             // failed for some reason, not returning as-is because it **might** contain funny stuff
             throw new UnableToRewriteSvgException($template);

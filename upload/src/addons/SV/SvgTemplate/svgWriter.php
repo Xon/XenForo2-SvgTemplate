@@ -10,6 +10,7 @@ use XF\App as BaseApp;
 use XF\CssWriter;
 use XF\Http\ResponseStream;
 use XF\Http\Response;
+use function strpos, gzdecode, md5;
 
 class svgWriter extends CssWriter
 {
@@ -88,7 +89,7 @@ class svgWriter extends CssWriter
                 $response->compressIfAble(false);
                 try
                 {
-                    @ini_set("zlib.output_compression", "Off");
+                    @\ini_set("zlib.output_compression", "Off");
                 }
                 catch (\Throwable $e) {}
                 if (!$this->isRenderingPng())
@@ -109,14 +110,14 @@ class svgWriter extends CssWriter
             {
                 if ($output instanceof ResponseStream)
                 {
-                    $output = \gzdecode($output->getContents());
+                    $output = gzdecode($output->getContents());
                 }
 
                 $cacheKey = $cacheObj = $img = null;
                 $caching = $this->app()->options()->svSvgTemplate_cacheRenderedSvg ?? false;
                 if ($caching)
                 {
-                    $cacheKey = 'svSvg_Png_' . \md5($output);
+                    $cacheKey = 'svSvg_Png_' . md5($output);
                     $cacheObj = $this->app()->cache('sv-svg-img', false);
                     if (!$cacheObj)
                     {

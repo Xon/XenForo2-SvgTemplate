@@ -7,6 +7,7 @@ namespace SV\SvgTemplate\XF\Mvc;
 
 use XF\Http\Request;
 use XF\Mvc\RouteMatch;
+use function strncasecmp, strlen, preg_match;
 
 /**
  * Extends \XF\Mvc\Router
@@ -32,10 +33,10 @@ class Router extends XFCP_Router
         }
 
         // strncasecmp should be very fast
-        if (strncasecmp($path, $this->friendlySvgUrl, \strlen($this->friendlySvgUrl)) === 0)
+        if (strncasecmp($path, $this->friendlySvgUrl, strlen($this->friendlySvgUrl)) === 0)
         {
             /** @noinspection RegExpRedundantEscape */
-            if (\preg_match('#^data/svg/(?<s>[^/]+)/(?<l>[^/]+)/(?<d>[^/]+)/(?<svg>[^\.]+\.(?:svg|png))$#i', $path, $matches))
+            if (preg_match('#^data/svg/(?<s>[^/]+)/(?<l>[^/]+)/(?<d>[^/]+)/(?<svg>[^\.]+\.(?:svg|png))$#i', $path, $matches))
             {
                 $input = $request->filter([
                     'k' => 'str'
@@ -49,7 +50,7 @@ class Router extends XFCP_Router
                 return $match;
             }
         }
-        else if (strncasecmp($path, $this->rawSvgUrl, \strlen($this->rawSvgUrl)) === 0)
+        else if (strncasecmp($path, $this->rawSvgUrl, strlen($this->rawSvgUrl)) === 0)
         {
             $input = $request->filter([
                 'svg' => 'str',

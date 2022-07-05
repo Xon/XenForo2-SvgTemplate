@@ -6,6 +6,7 @@ use SV\SvgTemplate\Repository\Svg as SvgRepo;
 use XF\Entity\Option as OptionEntity;
 use SV\SvgTemplate\XF\Entity\Option as ExtendedOptionEntity;
 use XF\Option\AbstractOption;
+use function is_callable, extension_loaded;
 
 /**
  * @since 2.3.0 rc1
@@ -24,10 +25,10 @@ class RenderSvgAsPng extends AbstractOption
         $svgRepo = \XF::repository('SV\SvgTemplate:Svg');
 
         $params = [
-            'procOpenCallStatus' => \is_callable('proc_open'),
-            'systemCallStatus' => \is_callable('system'),
+            'procOpenCallStatus' => is_callable('proc_open'),
+            'systemCallStatus' => is_callable('system'),
             'browserDetectionStatus' => $svgRepo->isSvBrowserDetectionActive(),
-            'imagickStatus' => \extension_loaded('imagick'),
+            'imagickStatus' => extension_loaded('imagick'),
             'imagickSvgFormatStatus' => false,
             'imagickPngFormatStatus' => false
         ];
