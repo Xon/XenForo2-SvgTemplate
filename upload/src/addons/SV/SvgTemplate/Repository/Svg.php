@@ -8,6 +8,7 @@ use Symfony\Component\Process\Process;
 use XF\Mvc\Entity\Repository;
 use XF\Util\File;
 use function array_key_exists, trim, strlen, pathinfo, system, file_get_contents,is_string, is_callable, extension_loaded, strtr, in_array;
+use function unlink;
 
 class Svg extends Repository
 {
@@ -157,21 +158,30 @@ class Svg extends Repository
 
     protected function convertSvg2PngCli(string $command, string $svg): string
     {
-        $dir = File::createTempDir();
-        $tempSourceFile = $dir . '/file.svg';
-        $tempDestFile = $dir . '/file.png';
+        // createTempDir has a race condition, so create a temp file via tempnam, and then add .svg/.png onto the end
+        // The file is left created as otherwise tempnam may reuse it
+        $filename = File::getTempFile();
+        $tempSourceFile = $filename . '.svg';
+        $tempDestFile = $filename . '.png';
 
         file_put_contents($tempSourceFile, $svg);
+        try
+        {
+            $command = strtr($command, [
+                '{destFile}' => $tempDestFile,
+                '{sourceFile}' => $tempSourceFile,
+            ]);
 
-        $command = strtr($command, [
-            '{destFile}' => $tempDestFile,
-            '{sourceFile}' => $tempSourceFile,
-        ]);
+            // dead simple, no real input/output capturing
+            system($command);
 
-        // dead simple, no real input/output capturing
-        system($command);
-
-        $img = @file_get_contents($tempDestFile);
+            $img = @file_get_contents($tempDestFile);
+        }
+        finally
+        {
+            @unlink($tempSourceFile);
+            @unlink($tempDestFile);
+        }
 
         return is_string($img) ? $img : '';
     }
