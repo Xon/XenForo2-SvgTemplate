@@ -211,7 +211,9 @@ class Svg extends Repository
         }
 
         $parts = pathinfo($template);
-        $extension = $parts['extension'];
+        $extension = $parts['extension'] ?? '';
+        $dirname = $parts['dirname'] ?? '';
+        $filename = $parts['filename'] ?? $template;
         $hasExtension = strlen($extension) !== 0;
 
         $supportedExtensions = $pngSupport ? ['svg', 'png'] : ['svg'];
@@ -230,7 +232,7 @@ class Svg extends Repository
 
         if (
             ($hasExtension && !in_array($extension, $supportedExtensions, true)) // unsupported extension
-            || (!empty($parts['dirname']) && $parts['dirname'] !== '.') // contains path info
+            || ($dirname !== '' && $dirname !== '.') // contains path info
         )
         {
             if ($forceExtension)
@@ -241,7 +243,7 @@ class Svg extends Repository
             throw new UnsupportedExtensionProvidedException($template);
         }
 
-        $template = $parts['filename'] . '.' . $finalExtension;
+        $template = $filename . '.' . $finalExtension;
 
         $app = \XF::app();
 
