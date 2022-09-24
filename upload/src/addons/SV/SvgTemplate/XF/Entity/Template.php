@@ -5,6 +5,7 @@
 
 namespace SV\SvgTemplate\XF\Entity;
 
+use SV\SvgTemplate\Exception\UnableToRewriteSvgException;
 use SV\SvgTemplate\XF\Template\Compiler;
 use XF\Template\Compiler\Ast as TemplateCompilerAst;
 use function strlen, substr, is_string, explode;
@@ -43,6 +44,13 @@ class Template extends XFCP_Template
         $isSvg = $this->isSvgTemplateForSv();
         if ($isSvg)
         {
+            if (strlen($template) === 0)
+            {
+                // svg templates must not be empty
+                $error = \XF::phrase('svSvgTemplate_template_can_not_be_empty', ['template' => "{$this->type}:{$this->title}"]);
+                return false;
+            }
+
             // shim the template compiler, so we don't need to compile the templates multiple times
             $originalTemplateCompiler = $app->container()->getOriginal('templateCompiler');
             $app->container()->set('templateCompiler', function() {
@@ -66,8 +74,15 @@ class Template extends XFCP_Template
         }
 
 
-        if ($isSvg && $isValidated && $this->getOption('test_compile') && $ast)
+        if ($isSvg && $isValidated && $this->getOption('test_compile'))
         {
+            if (!$ast)
+            {
+                // svg templates must not be empty
+                $error = \XF::phrase('svSvgTemplate_template_can_not_be_empty', ['template' => "{$this->type}:{$this->title}"]);
+                return false;
+            }
+
             $code = $compiler->previousCode ?? null;
             if (!$code)
             {
@@ -75,23 +90,23 @@ class Template extends XFCP_Template
                 $code = $compiler->compile($template);
             }
 
-            /** @var \XF\Repository\User $userRepo */
-            $userRepo = $this->repository('XF:User');
-            $guestUser = $userRepo->getGuestUser();
-            $output = \XF::asVisitor($guestUser, function() use ($code, $app) {
-
-                /** @var \SV\SvgTemplate\svgRenderer $renderer */
-                $rendererClass = $app->extendClass('SV\SvgTemplate\svgRenderer');
-                $renderer = new $rendererClass($app, $app->templater(), null);
-
-                return $renderer->renderTemplateRaw($code);
-            });
-
             $isValidSvg = false;
             $exceptionMsg = \XF::phraseDeferred('svSvgTemplate_unknown_error');
 
             try
             {
+                /** @var \XF\Repository\User $userRepo */
+                $userRepo = $this->repository('XF:User');
+                $guestUser = $userRepo->getGuestUser();
+                $output = \XF::asVisitor($guestUser, function () use ($code, $app) {
+
+                    /** @var \SV\SvgTemplate\svgRenderer $renderer */
+                    $rendererClass = $app->extendClass('SV\SvgTemplate\svgRenderer');
+                    $renderer = new $rendererClass($app, $app->templater(), null);
+
+                    return $renderer->renderTemplateRaw($code);
+                });
+
                 if ($output)
                 {
                     $dom = new \DOMDocument();
@@ -100,11 +115,18 @@ class Template extends XFCP_Template
                     $isValidSvg = is_string($output) && strlen($output) !== 0;
                 }
             }
+            catch (UnableToRewriteSvgException $exception)
+            {
+                $exceptionMsg = $exception->getMessage();
+            }
             catch (\Throwable $exception)
             {
                 $exceptionMsg = $exception->getMessage();
                 $exceptionMsgParts = explode(': ', $exceptionMsg);
-                $exceptionMsg = $exceptionMsgParts[1];
+                if (count($exceptionMsgParts) > 1)
+                {
+                    $exceptionMsg = $exceptionMsgParts[1];
+                }
             }
 
             if (!$isValidSvg)

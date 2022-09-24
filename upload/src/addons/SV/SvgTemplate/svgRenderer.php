@@ -406,7 +406,7 @@ class svgRenderer extends CssRenderer
         }
         catch (\Exception $e)
         {
-            throw new UnableToRewriteSvgException($template, 0, $e);
+            throw new UnableToRewriteSvgException($template, $e->getMessage(), 0, $e);
         }
         finally
         {
@@ -417,7 +417,7 @@ class svgRenderer extends CssRenderer
         if (!$rootElement)
         {
             // invalid XML
-            throw new UnableToRewriteSvgException($template);
+            throw new UnableToRewriteSvgException($template, 'SVGs must be valid XML');
         }
         $doc->encoding = 'utf-8';
         $doc->formatOutput = false;
@@ -448,7 +448,7 @@ class svgRenderer extends CssRenderer
             }
             catch (\Exception $e)
             {
-                throw new UnableToRewriteSvgException($template, 0, $e);
+                throw new UnableToRewriteSvgException($template, $e->getMessage(), 0, $e);
             }
 
             $rootElement->insertBefore($doc->createElement('style', $css), $rootElement->lastChild);

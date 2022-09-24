@@ -14,11 +14,11 @@ class UnableToRewriteSvgException extends \InvalidArgumentException
      */
     protected $templateName;
 
-    public function __construct(string $templateName, $code = 0, Throwable $previous = null)
+    public function __construct(string $templateName, string $message = 'Unable to rewrite SVG', $code = 0, Throwable $previous = null)
     {
         $this->templateName = $templateName;
 
-        parent::__construct('Unable to rewrite SVG.', $code, $previous);
+        parent::__construct($message, $code, $previous);
     }
 
     public function getTemplateName(): string
