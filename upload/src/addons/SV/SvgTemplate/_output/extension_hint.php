@@ -20,11 +20,6 @@ namespace SV\SvgTemplate\XF\Entity
 	class XFCP_Template extends \XF\Entity\Template {}
 }
 
-namespace SV\SvgTemplate\XF\Mail
-{
-	class XFCP_Templater extends \XF\Mail\Templater {}
-}
-
 namespace SV\SvgTemplate\XF\Mvc
 {
 	class XFCP_Router extends \XF\Mvc\Router {}
