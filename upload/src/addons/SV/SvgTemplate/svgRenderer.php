@@ -7,6 +7,7 @@ namespace SV\SvgTemplate;
 
 use SV\RedisCache\RawResponseText;
 use SV\RedisCache\Redis;
+use SV\StandardLib\TemplaterHelper;
 use SV\SvgTemplate\Exception\UnableToRewriteSvgException;
 use XF\App;
 use XF\CssRenderer;
@@ -89,6 +90,8 @@ class svgRenderer extends CssRenderer
 
     protected function filterValidTemplates(array $templates)
     {
+        $templaterHelper = TemplaterHelper::get($this->templater);
+        $pngSupported = $templaterHelper->svPngSupportEnabled ?? false;
         // only support rendering 1 svg/png at a time
         $checkedTemplates = [];
         foreach ($templates AS $template)
@@ -106,7 +109,7 @@ class svgRenderer extends CssRenderer
                 case 'svg':
                     break;
                 case 'png':
-                    if (!($this->templater->svTemplateHelper->svPngSupportEnabled ?? false))
+                    if (!$pngSupported)
                     {
                         return [];
                     }
