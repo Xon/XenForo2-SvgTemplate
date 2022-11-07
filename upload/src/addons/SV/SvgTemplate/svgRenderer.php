@@ -90,6 +90,7 @@ class svgRenderer extends CssRenderer
 
     protected function filterValidTemplates(array $templates)
     {
+        /** @var \SV\SvgTemplate\SV\StandardLib\TemplaterHelper $templaterHelper */
         $templaterHelper = TemplaterHelper::get($this->templater);
         $pngSupported = $templaterHelper->svPngSupportEnabled ?? false;
         // only support rendering 1 svg/png at a time
