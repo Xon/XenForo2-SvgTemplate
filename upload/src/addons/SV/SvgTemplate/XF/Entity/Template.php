@@ -103,6 +103,7 @@ class Template extends XFCP_Template
                     /** @var \SV\SvgTemplate\svgRenderer $renderer */
                     $rendererClass = $app->extendClass('SV\SvgTemplate\svgRenderer');
                     $renderer = new $rendererClass($app, $app->templater(), null);
+                    $renderer->setStyle($app->style($this->style_id));
 
                     return $renderer->renderTemplateRaw($code);
                 });
