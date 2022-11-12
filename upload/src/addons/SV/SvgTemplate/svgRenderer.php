@@ -33,12 +33,9 @@ class svgRenderer extends CssRenderer
     /** @var int|null */
     protected $inputModifiedDate = null;
 
-    public function __construct(App $app, Templater $templater, \Doctrine\Common\Cache\CacheProvider $cache = null)
+    public function __construct(App $app, Templater $templater)
     {
-        if ($cache === null)
-        {
-            $cache = \XF::app()->cache('css');
-        }
+        $cache = \XF::app()->cache('css');
         parent::__construct($app, $templater, $cache);
         Globals::templateHelper($this->templater)->automaticSvgUrlWriting = false;
 
