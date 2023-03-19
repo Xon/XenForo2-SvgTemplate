@@ -13,6 +13,7 @@ use XF\App;
 use XF\CssRenderer;
 use XF\Http\ResponseStream;
 use XF\Template\Templater;
+use XF\Util\File;
 use function preg_match, trim, strlen, is_array, reset, is_string, file_put_contents, array_unique, sort, md5, implode, strval, gzencode, unlink, is_callable;
 
 /**
@@ -249,12 +250,16 @@ class svgRenderer extends CssRenderer
     public function renderTemplateRaw($templateCode)
     {
         $templater = $this->templater;
-        $template = 'SVG-TEMP-COMPILE.SVG';
+        $templateName = 'SVG-TEMP-COMPILE.SVG';
 
-        $tmpFile = $templater->getTemplateFilePath('public', $template);
+        /** @var \XF\Entity\Template $template */
+        $template = $this->app->em()->create('XF:Template');
+        $template->title = $templateName;
+        $template->type = 'public';
+        $template->style_id = (int)$templater->getStyleId();
 
-        file_put_contents($tmpFile, "<?php\n" . $templateCode);
-        \XF\Util\Php::invalidateOpcodeCache($tmpFile);
+        $tmpFile = $template->getAbstractedCompiledTemplatePath(0,$template->style_id);
+        File::writeToAbstractedPath($tmpFile, "<?php\n" . $templateCode);
         try
         {
             $output = $templater->renderTemplate('public:' . $template, $this->renderParams, false);
@@ -262,16 +267,15 @@ class svgRenderer extends CssRenderer
             // always do rewrite/optimize, as this enables the less => css parsing in the <style> element
             if (strlen($output) !== 0)
             {
-                $output = $this->rewriteSvg($template, $output);
+                $output = $this->rewriteSvg($templateName, $output);
             }
 
             return $output;
         }
         finally
         {
-            @unlink($tmpFile);
-            \XF\Util\Php::invalidateOpcodeCache($tmpFile);
-            Globals::templateHelper($this->templater)->uncacheTemplateData('public', $template);
+            File::deleteFromAbstractedPath($tmpFile);
+            Globals::templateHelper($this->templater)->uncacheTemplateData('public', $templateName);
         }
     }
 
