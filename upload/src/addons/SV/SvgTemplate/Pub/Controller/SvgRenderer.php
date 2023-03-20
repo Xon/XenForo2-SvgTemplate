@@ -2,6 +2,7 @@
 
 namespace SV\SvgTemplate\Pub\Controller;
 
+use SV\SvgTemplate\svgWriter;
 use XF\Mvc\ParameterBag;
 use XF\Pub\Controller\AbstractController;
 
@@ -25,7 +26,7 @@ class SvgRenderer extends AbstractController
         /** @var \SV\SvgTemplate\svgRenderer $renderer */
         $renderer = new $rendererClass($app, $templater, $cache);
 
-        /** @var \SV\SvgTemplate\svgWriter $writer */
+        /** @var svgWriter $writer */
         $writer = new $writerClass($app, $renderer);
         $writer->setValidator($c['css.validator']);
 

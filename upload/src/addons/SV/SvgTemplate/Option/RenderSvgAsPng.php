@@ -6,6 +6,7 @@ use SV\SvgTemplate\Repository\Svg as SvgRepo;
 use XF\Entity\Option as OptionEntity;
 use SV\SvgTemplate\XF\Entity\Option as ExtendedOptionEntity;
 use XF\Option\AbstractOption;
+use XF\Repository\Style;
 use function is_callable, extension_loaded;
 
 /**
@@ -61,7 +62,7 @@ class RenderSvgAsPng extends AbstractOption
      * @param OptionEntity $option
      * @return bool
      */
-    public static function verifyOption(&$value, \XF\Entity\Option $option): bool
+    public static function verifyOption(&$value, OptionEntity $option): bool
     {
         $type = $value['type'] ?? '';
         if (!$type)
@@ -73,7 +74,7 @@ class RenderSvgAsPng extends AbstractOption
         \XF::runLater(function() use ($oldValue, $option) {
             if ($oldValue !== $option->option_value)
             {
-                /** @var \XF\Repository\Style $styleRepo */
+                /** @var Style $styleRepo */
                 $styleRepo = \XF::repository('XF:Style');
                 $styleRepo->updateAllStylesLastModifiedDateLater();
             }

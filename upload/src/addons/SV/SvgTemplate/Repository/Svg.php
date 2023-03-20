@@ -6,6 +6,7 @@ use SV\BrowserDetection\Listener;
 use SV\SvgTemplate\XF\Template\Exception\UnsupportedExtensionProvidedException;
 use Symfony\Component\Process\Process;
 use XF\Mvc\Entity\Repository;
+use XF\Template\Templater;
 use XF\Util\File;
 use function array_key_exists, trim, strlen, pathinfo, system, file_get_contents,is_string, is_callable, extension_loaded, strtr, in_array;
 use function unlink;
@@ -213,7 +214,7 @@ class Svg extends Repository
         return is_string($img) ? $img : '';
     }
 
-    public function getSvgUrl(\XF\Template\Templater $templater, &$escape, string $template, bool $pngSupport, bool $autoUrlRewrite, bool $includeValidation, string $forceExtension)
+    public function getSvgUrl(Templater $templater, &$escape, string $template, bool $pngSupport, bool $autoUrlRewrite, bool $includeValidation, string $forceExtension)
     {
         if (!$template)
         {

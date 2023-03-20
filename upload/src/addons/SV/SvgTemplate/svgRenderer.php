@@ -1,5 +1,6 @@
 <?php
 /**
+ * @noinspection PhpMissingParentCallCommonInspection
  * @noinspection PhpMissingReturnTypeInspection
  */
 
@@ -11,10 +12,11 @@ use SV\StandardLib\TemplaterHelper;
 use SV\SvgTemplate\Exception\UnableToRewriteSvgException;
 use XF\App;
 use XF\CssRenderer;
+use XF\Entity\Template;
 use XF\Http\ResponseStream;
 use XF\Template\Templater;
 use XF\Util\File;
-use function preg_match, trim, strlen, is_array, reset, is_string, file_put_contents, array_unique, sort, md5, implode, strval, gzencode, unlink, is_callable;
+use function preg_match, trim, strlen, is_array, reset, is_string, array_unique, sort, md5, implode, strval, gzencode, is_callable;
 
 /**
  * Class svgRenderer
@@ -252,7 +254,7 @@ class svgRenderer extends CssRenderer
         $templater = $this->templater;
         $templateName = 'SVG-TEMP-COMPILE.SVG';
 
-        /** @var \XF\Entity\Template $template */
+        /** @var Template $template */
         $template = $this->app->em()->create('XF:Template');
         $template->title = $templateName;
         $template->type = 'public';
@@ -351,7 +353,7 @@ class svgRenderer extends CssRenderer
                     }
                     else if ($compactSvg)
                     {
-                        if (\preg_match("#^(?:sodipodi:|inkscape:|metadata|desc)#ui", $nodeName))
+                        if (preg_match('#^(?:sodipodi:|inkscape:|metadata|desc)#ui', $nodeName))
                         {
                             $node->parentNode->removeChild($node);
                             $checkChildren = false;
@@ -363,7 +365,7 @@ class svgRenderer extends CssRenderer
                             {
                                 /** @var \DOMAttr $attribute */
                                 $attribute = $attributes->item($i2);
-                                if (\preg_match("#^(?:sodipodi:|inkscape:)#ui", $attribute->name))
+                                if (preg_match('#^(?:sodipodi:|inkscape:)#ui', $attribute->name))
                                 {
                                     $attributes->removeNamedItem();
                                 }
@@ -401,7 +403,7 @@ class svgRenderer extends CssRenderer
 
     protected function rewriteSvg(string $template, string $svg): string
     {
-        // An svg is just plain-text XML. so we can load, prune and save
+        // The svg format is just plain-text XML. so we can load, prune and save
         $doc = new \DOMDocument();
         $doc->preserveWhiteSpace = false;
         \libxml_use_internal_errors(true);

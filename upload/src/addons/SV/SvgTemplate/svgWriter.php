@@ -7,6 +7,7 @@ namespace SV\SvgTemplate;
 
 use SV\SvgTemplate\Repository\Svg as SvgRepo;
 use XF\App as BaseApp;
+use XF\CssRenderer;
 use XF\CssWriter;
 use XF\Http\ResponseStream;
 use XF\Http\Response;
@@ -38,7 +39,7 @@ class svgWriter extends CssWriter
     }
 
     /**
-     * @return \XF\CssRenderer|svgRenderer
+     * @return CssRenderer|svgRenderer
      */
     public function getRenderer() : svgRenderer
     {
@@ -53,6 +54,7 @@ class svgWriter extends CssWriter
         return $this->getRenderer()->isRenderingPng();
     }
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function finalizeOutput($output)
     {
         return $output;
@@ -89,7 +91,7 @@ class svgWriter extends CssWriter
                 $response->compressIfAble(false);
                 try
                 {
-                    @\ini_set("zlib.output_compression", "Off");
+                    @\ini_set('zlib.output_compression', 'Off');
                 }
                 catch (\Throwable $e) {}
                 if (!$this->isRenderingPng())

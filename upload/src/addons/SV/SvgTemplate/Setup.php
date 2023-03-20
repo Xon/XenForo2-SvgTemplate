@@ -7,6 +7,7 @@ use XF\AddOn\AbstractSetup;
 use XF\AddOn\StepRunnerInstallTrait;
 use XF\AddOn\StepRunnerUninstallTrait;
 use XF\AddOn\StepRunnerUpgradeTrait;
+use XF\Entity\ClassExtension;
 use function extension_loaded, is_callable;
 
 /**
@@ -24,11 +25,13 @@ class Setup extends AbstractSetup
 
     public function postInstall(array &$stateChanges)
     {
+        parent::postInstall($stateChanges);
         $this->syncSvgRouterIntegrationOption();
     }
 
     public function postUpgrade($previousVersion, array &$stateChanges)
     {
+        parent::postUpgrade($previousVersion, $stateChanges);
         $this->syncSvgRouterIntegrationOption();
     }
 
@@ -40,7 +43,7 @@ class Setup extends AbstractSetup
             return;
         }
 
-        /** @var \XF\Entity\ClassExtension $classExtension */
+        /** @var ClassExtension $classExtension */
         $classExtension = \XF::finder('XF:ClassExtension')
                              ->where('from_class', '=', 'XF\Mvc\Router')
                              ->where('to_class', '=', 'SV\SvgTemplate\XF\Mvc\Router')
@@ -60,6 +63,7 @@ class Setup extends AbstractSetup
      */
     public function checkRequirements(&$errors = [], &$warnings = [])
     {
+        parent::checkRequirements($errors, $warnings);
         $this->checkRequirementsTrait($errors, $warnings);
 
         if (extension_loaded('imagick'))

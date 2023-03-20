@@ -2,7 +2,9 @@
 
 namespace SV\SvgTemplate\SV\StandardLib;
 
+use SV\SvgTemplate\Repository\Svg;
 use XF\Mvc\Reply\AbstractReply;
+use XF\PreEscaped;
 use XF\Template\Templater as BaseTemplater;
 
 /**
@@ -13,7 +15,7 @@ class TemplaterHelper extends XFCP_TemplaterHelper
     public $automaticSvgUrlWriting = true;
     public $svPngSupportEnabled = false;
 
-    /** @var \SV\SvgTemplate\Repository\Svg */
+    /** @var Svg */
     protected $svSvgRepo;
 
     public function setup()
@@ -54,7 +56,7 @@ class TemplaterHelper extends XFCP_TemplaterHelper
      * @param string        $template
      * @param string        $extension
      * @param bool          $includeValidation
-     * @return string|\XF\PreEscaped
+     * @return string|PreEscaped
      * @noinspection PhpMissingParamTypeInspection
      */
     public function fnGetSvgUrlAs(BaseTemplater $templater, &$escape, string $template, string $extension, bool $includeValidation = false)
@@ -67,7 +69,7 @@ class TemplaterHelper extends XFCP_TemplaterHelper
      * @param bool|null     $escape
      * @param string        $template
      * @param bool          $includeValidation
-     * @return string|\XF\PreEscaped
+     * @return string|PreEscaped
      * @noinspection PhpMissingParamTypeInspection
      */
     public function fnGetSvgUrl(BaseTemplater $templater, &$escape, string $template, bool $includeValidation = false)

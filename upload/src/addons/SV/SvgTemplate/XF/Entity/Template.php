@@ -6,7 +6,9 @@
 namespace SV\SvgTemplate\XF\Entity;
 
 use SV\SvgTemplate\Exception\UnableToRewriteSvgException;
+use SV\SvgTemplate\svgRenderer;
 use SV\SvgTemplate\XF\Template\Compiler;
+use XF\Repository\User;
 use XF\Template\Compiler\Ast as TemplateCompilerAst;
 use function strlen, substr, is_string, explode;
 
@@ -95,12 +97,12 @@ class Template extends XFCP_Template
 
             try
             {
-                /** @var \XF\Repository\User $userRepo */
+                /** @var User $userRepo */
                 $userRepo = $this->repository('XF:User');
                 $guestUser = $userRepo->getGuestUser();
                 $output = \XF::asVisitor($guestUser, function () use ($code, $app) {
 
-                    /** @var \SV\SvgTemplate\svgRenderer $renderer */
+                    /** @var svgRenderer $renderer */
                     $rendererClass = $app->extendClass('SV\SvgTemplate\svgRenderer');
                     $renderer = new $rendererClass($app, $app->templater(), null);
                     $renderer->setStyle($app->style($this->style_id));

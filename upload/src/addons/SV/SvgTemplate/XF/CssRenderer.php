@@ -5,6 +5,7 @@
 
 namespace SV\SvgTemplate\XF;
 
+use Doctrine\Common\Cache\CacheProvider;
 use SV\SvgTemplate\Globals;
 use XF\App;
 use XF\Template\Templater;
@@ -15,7 +16,7 @@ use XF\Template\Templater;
  */
 class CssRenderer extends XFCP_CssRenderer
 {
-    public function __construct(App $app, Templater $templater, \Doctrine\Common\Cache\CacheProvider $cache = null)
+    public function __construct(App $app, Templater $templater, CacheProvider $cache = null)
     {
         parent::__construct($app, $templater, $cache);
         Globals::templateHelper($this->templater)->automaticSvgUrlWriting = false;
