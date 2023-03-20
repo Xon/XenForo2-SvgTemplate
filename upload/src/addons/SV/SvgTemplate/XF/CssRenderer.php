@@ -23,7 +23,7 @@ class CssRenderer extends XFCP_CssRenderer
 
     public function setTemplater(Templater $templater)
     {
-        $this->templater = $templater;
+        parent::setTemplater($templater);
         Globals::templateHelper($this->templater)->automaticSvgUrlWriting = false;
     }
 

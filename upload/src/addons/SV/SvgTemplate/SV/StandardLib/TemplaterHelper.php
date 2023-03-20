@@ -34,6 +34,7 @@ class TemplaterHelper extends XFCP_TemplaterHelper
 
     protected function populateTemplaterGlobalData(array &$data, AbstractReply $reply = null)
     {
+        parent::populateTemplaterGlobalData($data, $reply);
         $this->injectSvgArgs($data);
     }
 
