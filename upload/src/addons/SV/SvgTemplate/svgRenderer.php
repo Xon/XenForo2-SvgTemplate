@@ -256,6 +256,9 @@ class svgRenderer extends CssRenderer
         $template->title = $templateName;
         $template->type = 'public';
         $template->style_id = (int)$templater->getStyleId();
+        $template->addon_id = 'SV/SvgTemplate';
+        $template->setTrusted('template', $templateCode);
+        $template->setReadOnly(true);
 
         $tmpFile = $template->getAbstractedCompiledTemplatePath(0,$template->style_id);
         File::writeToAbstractedPath($tmpFile, "<?php\n" . $templateCode);
