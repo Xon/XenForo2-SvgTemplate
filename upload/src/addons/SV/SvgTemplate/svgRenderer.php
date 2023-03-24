@@ -251,19 +251,21 @@ class svgRenderer extends CssRenderer
     {
         $templater = $this->templater;
         $tmpTemplateName = 'SVG-TEMP-COMPILE.SVG';
+        $styleId = (int)$templater->getStyleId();
+        $languageId = $templater->getLanguage()->getId();
 
         /** @var Template $template */
         $template = $this->app->em()->instantiateEntity('XF:Template', [
             'template_id' => -1,
             'title' => $tmpTemplateName,
             'type' => 'public',
-            'style_id' => (int)$templater->getStyleId(),
+            'style_id' => $styleId,
             'addon_id' => 'SV/SvgTemplate',
             'template' => $templateCode,
         ]);
         $template->setReadOnly(true);
 
-        $tmpFile = $template->getAbstractedCompiledTemplatePath(0, $template->style_id, true);
+        $tmpFile = $template->getAbstractedCompiledTemplatePath($languageId, $styleId, true);
         File::writeToAbstractedPath($tmpFile, "<?php\n" . $templateCode);
         try
         {
