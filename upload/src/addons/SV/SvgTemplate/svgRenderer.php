@@ -264,7 +264,7 @@ class svgRenderer extends CssRenderer
         File::writeToAbstractedPath($tmpFile, "<?php\n" . $templateCode);
         try
         {
-            $output = $templater->renderTemplate('public:' . $template, $this->renderParams, false);
+            $output = $templater->renderTemplate('public:' . $templateName, $this->renderParams, false);
             $output = trim($output);
             // always do rewrite/optimize, as this enables the less => css parsing in the <style> element
             if (strlen($output) !== 0)
