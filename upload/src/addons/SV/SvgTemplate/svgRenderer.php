@@ -246,14 +246,15 @@ class svgRenderer extends CssRenderer
         return '';
     }
 
-    public function renderTemplateRaw($templateCode)
+    /** @noinspection PhpUnusedParameterInspection */
+    public function renderTemplateRaw(string $templateName, string $templateCode): string
     {
         $templater = $this->templater;
-        $templateName = 'SVG-TEMP-COMPILE.SVG';
+        $tmpTemplateName = 'SVG-TEMP-COMPILE.SVG';
 
         /** @var Template $template */
         $template = $this->app->em()->create('XF:Template');
-        $template->title = $templateName;
+        $template->title = $tmpTemplateName;
         $template->type = 'public';
         $template->style_id = (int)$templater->getStyleId();
         $template->addon_id = 'SV/SvgTemplate';
@@ -264,12 +265,12 @@ class svgRenderer extends CssRenderer
         File::writeToAbstractedPath($tmpFile, "<?php\n" . $templateCode);
         try
         {
-            $output = $templater->renderTemplate('public:' . $templateName, $this->renderParams, false);
+            $output = $templater->renderTemplate('public:' . $tmpTemplateName, $this->renderParams, false);
             $output = trim($output);
             // always do rewrite/optimize, as this enables the less => css parsing in the <style> element
             if (strlen($output) !== 0)
             {
-                $output = $this->rewriteSvg($templateName, $output);
+                $output = $this->rewriteSvg($tmpTemplateName, $output);
             }
 
             return $output;
@@ -277,7 +278,7 @@ class svgRenderer extends CssRenderer
         finally
         {
             File::deleteFromAbstractedPath($tmpFile);
-            Globals::templateHelper($this->templater)->uncacheTemplateData('public', $templateName);
+            Globals::templateHelper($this->templater)->uncacheTemplateData('public', $tmpTemplateName);
         }
     }
 

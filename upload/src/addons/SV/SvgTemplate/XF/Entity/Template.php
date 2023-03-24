@@ -107,7 +107,7 @@ class Template extends XFCP_Template
                     $renderer = new $rendererClass($app, $app->templater(), null);
                     $renderer->setStyle($app->style($this->style_id));
 
-                    return $renderer->renderTemplateRaw($code);
+                    return $renderer->renderTemplateRaw($this->title, $code);
                 });
 
                 if ($output)
