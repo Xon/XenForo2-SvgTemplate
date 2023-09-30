@@ -4,7 +4,6 @@ namespace SV\SvgTemplate\Option;
 
 use SV\SvgTemplate\Repository\Svg as SvgRepo;
 use XF\Entity\Option as OptionEntity;
-use SV\SvgTemplate\XF\Entity\Option as ExtendedOptionEntity;
 use XF\Option\AbstractOption;
 use XF\Repository\Style;
 use function is_callable, extension_loaded;
@@ -43,12 +42,6 @@ class RenderSvgAsPng extends AbstractOption
         return $params;
     }
 
-    /**
-     * @param OptionEntity|ExtendedOptionEntity $option
-     * @param array $htmlParams
-     *
-     * @return string
-     */
     public static function renderOption(OptionEntity $option, array $htmlParams) : string
     {
         $optionTemplate = static::getOptionTemplateName($option);
@@ -57,11 +50,6 @@ class RenderSvgAsPng extends AbstractOption
         return self::getTemplate($optionTemplate, $option, $htmlParams, $optionParams);
     }
 
-    /**
-     * @param mixed        $value
-     * @param OptionEntity $option
-     * @return bool
-     */
     public static function verifyOption(&$value, OptionEntity $option): bool
     {
         $type = $value['type'] ?? '';

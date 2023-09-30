@@ -3,12 +3,13 @@
 namespace SV\SvgTemplate\Pub\Controller;
 
 use XF\Mvc\ParameterBag;
+use XF\Mvc\Reply\AbstractReply;
 use XF\Pub\Controller\AbstractController;
 
 class SvgRenderer extends AbstractController
 {
     /** @noinspection PhpFullyQualifiedNameUsageInspection */
-    public function actionIndex(ParameterBag $params)
+    public function actionIndex(ParameterBag $params): AbstractReply
     {
         $app = $this->app();
         $request = $app->request();

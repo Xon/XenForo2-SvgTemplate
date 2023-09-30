@@ -23,19 +23,19 @@ class Setup extends AbstractSetup
     use StepRunnerUpgradeTrait;
     use StepRunnerUninstallTrait;
 
-    public function postInstall(array &$stateChanges)
+    public function postInstall(array &$stateChanges): void
     {
         parent::postInstall($stateChanges);
         $this->syncSvgRouterIntegrationOption();
     }
 
-    public function postUpgrade($previousVersion, array &$stateChanges)
+    public function postUpgrade($previousVersion, array &$stateChanges): void
     {
         parent::postUpgrade($previousVersion, $stateChanges);
         $this->syncSvgRouterIntegrationOption();
     }
 
-    protected function syncSvgRouterIntegrationOption()
+    protected function syncSvgRouterIntegrationOption(): void
     {
         $options = \XF::options();
         if (!$options->offsetExists('svSvgTemplateRouterIntegration'))
@@ -61,7 +61,7 @@ class Setup extends AbstractSetup
      * @param array $errors
      * @param array $warnings
      */
-    public function checkRequirements(&$errors = [], &$warnings = [])
+    public function checkRequirements(&$errors = [], &$warnings = []): void
     {
         parent::checkRequirements($errors, $warnings);
         $this->checkRequirementsTrait($errors, $warnings);

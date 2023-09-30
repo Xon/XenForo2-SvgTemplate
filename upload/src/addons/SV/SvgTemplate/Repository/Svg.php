@@ -13,9 +13,6 @@ use function unlink;
 
 class Svg extends Repository
 {
-    /**
-     * @return bool
-     */
     public function isSvBrowserDetectionActive() : bool
     {
         return array_key_exists(
@@ -24,11 +21,6 @@ class Svg extends Repository
         );
     }
 
-    /**
-     * Returns if all the requirements for converting SVG to PNG pass.
-     *
-     * @return bool
-     */
     public function isSvg2PngEnabled() : bool
     {
         $renderSvgAsPng = $this->app()->options()->svSvgTemplate_renderSvgAsPng ?? [];
@@ -48,13 +40,6 @@ class Svg extends Repository
         }
     }
 
-    /**
-     * Returns if the SVG needs to be converted as PNG.
-     *
-     * @return bool
-     *
-     * @throws \Exception
-     */
     public function requiresConvertingSvg2Png() : bool
     {
         if (!$this->isSvBrowserDetectionActive())
@@ -214,7 +199,7 @@ class Svg extends Repository
         return is_string($img) ? $img : '';
     }
 
-    public function getSvgUrl(Templater $templater, &$escape, string $template, bool $pngSupport, bool $autoUrlRewrite, bool $includeValidation, string $forceExtension)
+    public function getSvgUrl(Templater $templater, &$escape, string $template, bool $pngSupport, bool $autoUrlRewrite, bool $includeValidation, string $forceExtension): string
     {
         if (!$template)
         {
