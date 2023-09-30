@@ -86,9 +86,9 @@ class svgWriter extends CssWriter
 
     /**
      * @param string|Response $output
-     * @return string|Response
+     * @return Response
      */
-    public function getResponse($output)
+    public function getResponse($output): Response
     {
         $response = parent::getResponse($output);
         $response = $this->setupResponse($response);
@@ -122,7 +122,7 @@ class svgWriter extends CssWriter
             $response->body('');
             $response->httpCode(404);
 
-            return '';
+            return $response;
         }
 
         if (!$this->isRenderingPng())
