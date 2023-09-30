@@ -2,13 +2,12 @@
 
 namespace SV\SvgTemplate\Pub\Controller;
 
-use SV\SvgTemplate\svgWriter;
 use XF\Mvc\ParameterBag;
 use XF\Pub\Controller\AbstractController;
 
 class SvgRenderer extends AbstractController
 {
-
+    /** @noinspection PhpFullyQualifiedNameUsageInspection */
     public function actionIndex(ParameterBag $params)
     {
         $app = $this->app();
@@ -17,17 +16,10 @@ class SvgRenderer extends AbstractController
 
         // copied from svg.php, and needs to be kept in sync!!!
         $templater = $app->templater();
-        $cache = $app->cache();
         $c = $app->container();
 
-        $rendererClass = $app->extendClass(\SV\SvgTemplate\svgRenderer::class);
-        $writerClass = $app->extendClass(\SV\SvgTemplate\svgWriter::class);
-
-        /** @var \SV\SvgTemplate\svgRenderer $renderer */
-        $renderer = new $rendererClass($app, $templater, $cache);
-
-        /** @var svgWriter $writer */
-        $writer = new $writerClass($app, $renderer);
+        $renderer = \SV\SvgTemplate\svgRenderer::factory($app, $templater);
+        $writer = \SV\SvgTemplate\svgWriter::factory($app,$renderer);
         $writer->setValidator($c['css.validator']);
 
         $showDebugOutput = (\XF::$debugMode && $request->get('_debug'));

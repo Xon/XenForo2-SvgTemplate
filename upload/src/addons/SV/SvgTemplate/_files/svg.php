@@ -1,4 +1,7 @@
 <?php
+/**
+ * @noinspection PhpFullyQualifiedNameUsageInspection
+ */
 
 $dir = __DIR__;
 /** @noinspection PhpIncludeInspection */
@@ -31,17 +34,10 @@ if (!$input['l'] && $input['langauge'])
 }
 
 $templater = $app->templater();
-$cache = $app->cache();
 $c = $app->container();
 
-$rendererClass = $app->extendClass(\SV\SvgTemplate\svgRenderer::class);
-$writerClass = $app->extendClass(\SV\SvgTemplate\svgWriter::class);
-
-/** @var \SV\SvgTemplate\svgRenderer $renderer */
-$renderer = new $rendererClass($app, $templater, $cache);
-
-/** @var \SV\SvgTemplate\svgWriter $writer */
-$writer = new $writerClass($app, $renderer);
+$renderer = \SV\SvgTemplate\svgRenderer::factory($app, $templater);
+$writer = \SV\SvgTemplate\svgWriter::factory($app,$renderer);
 $writer->setValidator($c['css.validator']);
 
 $showDebugOutput = (\XF::$debugMode && $request->get('_debug'));

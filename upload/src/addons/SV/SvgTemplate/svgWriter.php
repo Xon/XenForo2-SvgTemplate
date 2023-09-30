@@ -6,6 +6,7 @@
 namespace SV\SvgTemplate;
 
 use SV\SvgTemplate\Repository\Svg as SvgRepo;
+use XF\App;
 use XF\App as BaseApp;
 use XF\CssWriter;
 use XF\Http\ResponseStream;
@@ -19,6 +20,13 @@ class svgWriter extends CssWriter
 {
     /** @var int */
     public const PNG_CACHE_TIME = 3600; // 1 hour
+
+    public static function factory(App $app, svgRenderer $renderer): self
+    {
+        $writer = $app->extendClass(svgWriter::class);
+
+        return new $writer($app, $renderer);
+    }
 
     public function run(array $templates, $styleId, $languageId, $validation = null, int $date = null): Response
     {

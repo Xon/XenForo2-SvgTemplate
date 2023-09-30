@@ -17,7 +17,7 @@ use function strlen, substr, is_string, explode;
  */
 class Template extends XFCP_Template
 {
-    const SVG_TEMPLATE_NAME_SUFFIX_FOR_SV = '.svg';
+    public const SVG_TEMPLATE_NAME_SUFFIX_FOR_SV = '.svg';
 
     protected function isSvgTemplateForSv() : bool
     {
@@ -102,9 +102,7 @@ class Template extends XFCP_Template
                 $guestUser = $userRepo->getGuestUser();
                 $output = \XF::asVisitor($guestUser, function () use ($code, $app) {
 
-                    /** @var svgRenderer $renderer */
-                    $rendererClass = $app->extendClass(\SV\SvgTemplate\svgRenderer::class);
-                    $renderer = new $rendererClass($app, $app->templater(), null);
+                    $renderer = svgRenderer::factory($this->app());
                     $renderer->setStyle($app->style($this->style_id));
 
                     return $renderer->renderTemplateRaw($this->title, $code);

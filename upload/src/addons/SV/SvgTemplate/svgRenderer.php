@@ -24,7 +24,7 @@ use function preg_match, trim, strlen, is_array, reset, is_string, array_unique,
 class svgRenderer extends CssRenderer
 {
     /** @var int */
-    const SVG_CACHE_TIME = 3600; // 1 hour
+    public const SVG_CACHE_TIME = 3600; // 1 hour
 
     /** @var bool */
     protected $compactSvg = true;
@@ -49,13 +49,20 @@ class svgRenderer extends CssRenderer
         }
     }
 
-    public function setTemplater(Templater $templater)
+    public static function factory(App $app, ?Templater $templater = null): self
+    {
+        $rendererClass = $app->extendClass(svgRenderer::class);
+
+        return new $rendererClass($app, $templater ?? $app->templater());
+    }
+
+    public function setTemplater(Templater $templater): void
     {
         $this->templater = $templater;
         Globals::templateHelper($this->templater)->automaticSvgUrlWriting = false;
     }
 
-    protected function getRenderParams()
+    protected function getRenderParams(): array
     {
         $params = parent::getRenderParams();
 
@@ -69,25 +76,22 @@ class svgRenderer extends CssRenderer
         return $this->isRenderingPng;
     }
 
-    public function setForceRawCache(bool $value)
+    public function setForceRawCache(bool $value): void
     {
         $this->echoUncompressedData = $value;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getInputModifiedDate()
+    public function getInputModifiedDate(): ?int
     {
         return $this->inputModifiedDate;
     }
 
-    public function setInputModifiedDate(int $value = null)
+    public function setInputModifiedDate(int $value = null): void
     {
         $this->inputModifiedDate = $value;
     }
 
-    protected function filterValidTemplates(array $templates)
+    protected function filterValidTemplates(array $templates): array
     {
         $pngSupported = Globals::templateHelper($this->templater)->svPngSupportEnabled ?? false;
         // only support rendering 1 svg/png at a time
@@ -133,6 +137,10 @@ class svgRenderer extends CssRenderer
         return $checkedTemplates;
     }
 
+    /**
+     * @param array $templates
+     * @return string|ResponseStream
+     */
     protected function getFinalCachedOutput(array $templates)
     {
         $cache = $this->cache;
@@ -165,7 +173,7 @@ class svgRenderer extends CssRenderer
         return $output ? @\gzdecode($output) : '';
     }
 
-    protected function getFinalCacheKey(array $templates)
+    protected function getFinalCacheKey(array $templates): string
     {
         $elements = $this->getCacheKeyElements();
 
@@ -192,7 +200,7 @@ class svgRenderer extends CssRenderer
         return new RawResponseText($length ? $output : '', $length);
     }
 
-    protected function cacheFinalOutput(array $templates, $output)
+    protected function cacheFinalOutput(array $templates, $output): void
     {
         $cache = $this->cache;
         if (!$this->allowCached || !$this->allowFinalCacheUpdate || !($cache instanceof Redis) || !($credis = $cache->getCredis(false)))
@@ -213,13 +221,13 @@ class svgRenderer extends CssRenderer
         $credis->expire($key, static::SVG_CACHE_TIME);
     }
 
-    protected function getIndividualCachedTemplates(array $templates)
+    protected function getIndividualCachedTemplates(array $templates): array
     {
         // xf_css_cache is silly, so avoid the extra database hit
         return [];
     }
 
-    protected function renderTemplates(array $templates, array $cached = [], array &$errors = null)
+    protected function renderTemplates(array $templates, array $cached = [], array &$errors = null): string
     {
         $errors = [];
         $this->renderParams = $this->getRenderParams();
@@ -286,11 +294,11 @@ class svgRenderer extends CssRenderer
         }
     }
 
-    public function renderTemplate($template, &$error = null, &$updateCache = true)
+    public function renderTemplate($template, &$error = null, &$updateCache = true): ?string
     {
         if (!$this->templater->isKnownTemplate($template))
         {
-            return false;
+            return null;
         }
 
         try
@@ -313,17 +321,13 @@ class svgRenderer extends CssRenderer
             \XF::logException($e);
             $error = $e->getMessage();
 
-            return false;
+            return null;
         }
     }
 
-    /**
-     * @return \Less_Parser
-     * @noinspection PhpMissingReturnTypeInspection
-     */
-    protected function getLessParser()
+    protected function getLessParser(): \Less_Parser
     {
-        if (!$this->lessParser)
+        if ($this->lessParser === null)
         {
             $options = [
                 'compress' => $this->compactSvg,
@@ -335,7 +339,7 @@ class svgRenderer extends CssRenderer
         return $this->lessParser;
     }
 
-    protected function cleanNodeList(\DOMNode $parentNode, string &$styling)
+    protected function cleanNodeList(\DOMNode $parentNode, string &$styling): void
     {
         $compactSvg = $this->compactSvg;
         // iterate backwards as this allows removing elements, as the list is "dynamic"
