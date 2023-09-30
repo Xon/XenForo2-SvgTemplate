@@ -103,7 +103,7 @@ class Template extends XFCP_Template
                 $output = \XF::asVisitor($guestUser, function () use ($code, $app) {
 
                     /** @var svgRenderer $renderer */
-                    $rendererClass = $app->extendClass('SV\SvgTemplate\svgRenderer');
+                    $rendererClass = $app->extendClass(\SV\SvgTemplate\svgRenderer::class);
                     $renderer = new $rendererClass($app, $app->templater(), null);
                     $renderer->setStyle($app->style($this->style_id));
 

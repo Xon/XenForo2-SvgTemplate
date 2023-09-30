@@ -34,8 +34,8 @@ $templater = $app->templater();
 $cache = $app->cache();
 $c = $app->container();
 
-$rendererClass = $app->extendClass('SV\SvgTemplate\svgRenderer');
-$writerClass = $app->extendClass('SV\SvgTemplate\svgWriter');
+$rendererClass = $app->extendClass(\SV\SvgTemplate\svgRenderer::class);
+$writerClass = $app->extendClass(\SV\SvgTemplate\svgWriter::class);
 
 /** @var \SV\SvgTemplate\svgRenderer $renderer */
 $renderer = new $rendererClass($app, $templater, $cache);
