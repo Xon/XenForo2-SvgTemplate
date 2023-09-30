@@ -2,7 +2,7 @@
     "legacy_addon_id": "SV_SVGTemplate",
     "title": "SVG Template",
     "description": "SVG as Templates",
-    "version_id": 1679631212,
+    "version_id": 1696060715,
     "version_string": "2.5.0",
     "dev": "Xon",
     "dev_url": "https://atelieraphelion.com",
@@ -30,7 +30,7 @@
             "*",
             "PHP ImageMagick Extension"
         ],
-        "SV/RedisCache" : [
+        "SV/RedisCache": [
             "2.0.0",
             "Redis Cache v2.0.0",
             false
