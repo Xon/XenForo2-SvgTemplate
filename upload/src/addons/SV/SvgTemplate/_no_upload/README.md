@@ -54,6 +54,11 @@ Note; template names are only alpha-numeric strings, which is enforced by valida
 
 ### resvg CLI support
 
+Example using [resvg v0.35.0+](https://github.com/RazrFalcon/resvg), configure `CLI - Pipe` command with;
+```
+/usr/local/bin/resvg --quiet --resources-dir=/tmp/ - -c
+```
+
 Example using [resvg](https://github.com/RazrFalcon/resvg), configure `CLI` command with;
 ```
 /usr/local/bin/resvg --quiet {sourceFile} {destFile}
@@ -118,10 +123,10 @@ Explicit usage in templates;
 <xf:if is="$xf.svg.enabled">
     <xf:if is="$xf.svg.as.png and $xf.mobileDetect and $xf.mobileDetect.isMobile()">
         <img src="{{ getSvgUrlAs('example.svg', 'png') }}"/>
-        <xf:else />
+    <xf:else />
         <img src="{{ getSvgUrlAs('example.svg', 'svg') }}"/>
     </xf:if>
-    <xf:else />
+<xf:else />
     <i class="fa fa-stop" />
 </xf:if>
 ```
@@ -167,5 +172,5 @@ ie, should look similar to;
 
 ## Requirements
 
-- XenForo 2.1+
-- PHP 7.0+ or newer
+- XenForo 2.2+
+- PHP 7.2+ or newer
