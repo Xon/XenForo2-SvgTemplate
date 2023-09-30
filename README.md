@@ -60,8 +60,8 @@ Example using [resvg](https://github.com/RazrFalcon/resvg), configure `CLI` comm
 ```
 
 #### Precompiled binary
-Pre-compiled linux x86_64 binary has been made available [here](https://github.com/Xon/resvg/releases/download/v0.23.0/resvg-x86_64-0.23.0.zip).
-Compiled on CentOS 7, works on Ubuntu 18.04/20.04
+Pre-compiled linux x86_64 binary has been made available [here](https://github.com/Xon/resvg/releases/download/v0.35.0/resvg-x86_64-0.35.0.zip).
+Compiled on CentOS 7, works on Ubuntu 18.04/20.04/22.04
 
 #### Compiling
 
