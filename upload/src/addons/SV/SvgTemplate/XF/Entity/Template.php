@@ -8,6 +8,7 @@ namespace SV\SvgTemplate\XF\Entity;
 use SV\SvgTemplate\Exception\UnableToRewriteSvgException;
 use SV\SvgTemplate\svgRenderer;
 use SV\SvgTemplate\XF\Template\Compiler;
+use XF\Phrase;
 use XF\Repository\User;
 use XF\Template\Compiler\Ast as TemplateCompilerAst;
 use function strlen, substr, is_string, explode;
@@ -36,47 +37,44 @@ class Template extends XFCP_Template
      * @param string $template
      * @param bool $forceValid
      * @param TemplateCompilerAst|null $ast
-     * @param null $error
+     * @param Phrase|null $error
      *
      * @return bool
      */
     protected function validateTemplateText($template, $forceValid = false, &$ast = null, &$error = null)
     {
         $app = $this->app();
-        $isSvg = $this->isSvgTemplateForSv();
-        if ($isSvg)
+        if (!$this->isSvgTemplateForSv())
         {
-            if (strlen($template) === 0)
-            {
-                // svg templates must not be empty
-                $error = \XF::phrase('svSvgTemplate_template_can_not_be_empty', ['template' => "{$this->type}:{$this->title}"]);
-                return false;
-            }
-
-            // shim the template compiler, so we don't need to compile the templates multiple times
-            $originalTemplateCompiler = $app->container()->getOriginal('templateCompiler');
-            $app->container()->set('templateCompiler', function() {
-                return new Compiler();
-            });
+            return parent::validateTemplateText($template, $forceValid, $ast, $error);
         }
+
+        if (strlen($template) === 0)
+        {
+            // svg templates must not be empty
+            $error = \XF::phrase('svSvgTemplate_template_can_not_be_empty', ['template' => "{$this->type}:{$this->title}"]);
+            return false;
+        }
+
+        // shim the template compiler, so we don't need to compile the templates multiple times
+        $originalTemplateCompiler = $app->container()->getOriginal('templateCompiler');
+        $app->container()->set('templateCompiler', function() {
+            return new Compiler();
+        });
         try
         {
             $isValidated = parent::validateTemplateText($template, $forceValid, $ast, $error);
         }
         finally
         {
-            if ($isSvg)
-            {
-                /** @var Compiler $compiler */
-                $compiler = $this->app()->templateCompiler();
+            /** @var Compiler $compiler */
+            $compiler = $this->app()->templateCompiler();
 
-                $app->container()->offsetUnset('templateCompiler');
-                $app->container()->set('templateCompiler', $originalTemplateCompiler);
-            }
+            $app->container()->offsetUnset('templateCompiler');
+            $app->container()->set('templateCompiler', $originalTemplateCompiler);
         }
 
-
-        if ($isSvg && $isValidated && $this->getOption('test_compile'))
+        if ($isValidated && $this->getOption('test_compile'))
         {
             if (!$ast)
             {
