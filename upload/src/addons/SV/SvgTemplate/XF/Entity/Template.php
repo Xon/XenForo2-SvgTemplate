@@ -22,8 +22,12 @@ class Template extends XFCP_Template
 
     protected function isSvgTemplateForSv() : bool
     {
-        $templateName = $this->title;
+        $templateName = $this->title ?? '';
         $templateNameLength = strlen($templateName);
+        if ($templateNameLength === 0)
+        {
+            return false;
+        }
 
         $templateSuffix = static::SVG_TEMPLATE_NAME_SUFFIX_FOR_SV;
         $templateSuffixLength = strlen($templateSuffix);
