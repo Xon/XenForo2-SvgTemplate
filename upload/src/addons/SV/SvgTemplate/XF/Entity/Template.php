@@ -11,7 +11,8 @@ use SV\SvgTemplate\XF\Template\Compiler;
 use XF\Phrase;
 use XF\Repository\User;
 use XF\Template\Compiler\Ast as TemplateCompilerAst;
-use function strlen, substr, is_string, explode;
+use function strlen, is_string, explode;
+use function substr_compare;
 
 /**
  * @since 2.3.0 rc5
@@ -31,10 +32,12 @@ class Template extends XFCP_Template
 
         $templateSuffix = static::SVG_TEMPLATE_NAME_SUFFIX_FOR_SV;
         $templateSuffixLength = strlen($templateSuffix);
+        if ($templateNameLength <= $templateSuffixLength)
+        {
+            return false;
+        }
 
-        $suffixFound = substr($templateName, $templateNameLength - $templateSuffixLength);
-
-        return $suffixFound === $templateSuffix;
+        return substr_compare($templateName, $templateSuffix, -$templateSuffixLength) === 0;
     }
 
     /**
