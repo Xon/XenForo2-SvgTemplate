@@ -8,6 +8,7 @@ namespace SV\SvgTemplate;
 
 use SV\RedisCache\RawResponseText;
 use SV\RedisCache\Redis;
+use SV\RedisCache\Repository\Redis as RedisRepo;
 use SV\SvgTemplate\Exception\UnableToRewriteSvgException;
 use XF\App;
 use XF\CssRenderer;
@@ -34,6 +35,8 @@ class svgRenderer extends CssRenderer
     protected $isRenderingPng = false;
     /** @var int|null */
     protected $inputModifiedDate = null;
+    /** @var Redis */
+    protected $redisCache = null;
 
     public function __construct(App $app, Templater $templater)
     {
@@ -47,6 +50,8 @@ class svgRenderer extends CssRenderer
             $this->compactSvg = true;
             $this->allowCached = true;
         }
+
+        $this->redisCache = \XF::isAddOnActive('SV/RedisCache') ? RedisRepo::get()->getRedisObj($cache) : null;
     }
 
     public static function factory(App $app, ?Templater $templater = null): self
@@ -143,14 +148,13 @@ class svgRenderer extends CssRenderer
      */
     protected function getFinalCachedOutput(array $templates)
     {
-        $cache = $this->cache;
-        if (!$this->allowCached || !($cache instanceof Redis) || !($credis = $cache->getCredis(true)))
+        $cache = $this->redisCache;
+        if (!$this->allowCached || $cache === null || !($credis = $cache->getCredis(true)))
         {
             return parent::getFinalCachedOutput($templates);
         }
 
-        $redis = $cache;
-        $key = $redis->getNamespacedId($this->getFinalCacheKey($templates) . '_gz');
+        $key = $cache->getNamespacedId($this->getFinalCacheKey($templates) . '_gz');
         $data = $credis->hGetAll($key);
         if (!is_array($data))
         {
@@ -202,8 +206,8 @@ class svgRenderer extends CssRenderer
 
     protected function cacheFinalOutput(array $templates, $output): void
     {
-        $cache = $this->cache;
-        if (!$this->allowCached || !$this->allowFinalCacheUpdate || !($cache instanceof Redis) || !($credis = $cache->getCredis(false)))
+        $cache = $this->redisCache;
+        if (!$this->allowCached || !$this->allowFinalCacheUpdate || $cache === null || !($credis = $cache->getCredis(false)))
         {
             parent::cacheFinalOutput($templates, $output);
 
@@ -212,8 +216,7 @@ class svgRenderer extends CssRenderer
 
         $output = strval($output);
 
-        $redis = $cache;
-        $key = $redis->getNamespacedId($this->getFinalCacheKey($templates) . '_gz');
+        $key = $cache->getNamespacedId($this->getFinalCacheKey($templates) . '_gz');
         $credis->hMSet($key, [
             'o' => $output ? gzencode($output, 9) : null,
             'l' => strlen($output),

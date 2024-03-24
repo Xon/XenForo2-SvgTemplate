@@ -187,11 +187,22 @@ class Svg extends Repository
         return true;
     }
 
+    /** @noinspection RedundantSuppression */
     protected function convertSvg2PngCliPipe(string $command, string $svg): string
     {
-        $process = new Process($command);
+        if (\XF::$versionId >= 2030000)
+        {
+            /** @noinspection PhpUndefinedMethodInspection */
+            $process = Process::fromShellCommandline($command);
+        }
+        else
+        {
+            /** @noinspection PhpParamsInspection */
+            $process = new Process($command);
+            /** @noinspection PhpUndefinedMethodInspection */
+            $process->setCommandLine($process->getCommandLine());
+        }
         $process->setTimeout(null);
-        $process->setCommandLine($process->getCommandLine());
         $process->setInput($svg);
         $process->run();
         $img = $process->getOutput();
