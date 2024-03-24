@@ -28,7 +28,7 @@ class svgWriter extends CssWriter
         return new $writer($app, $renderer);
     }
 
-    public function run(array $templates, $styleId, $languageId, $validation = null, int $date = null): Response
+    public function run(array $templates, $styleId, $languageId, $validation = null, ?int $date = null): Response
     {
         $request = \XF::app()->request();
         $renderer = $this->renderer;

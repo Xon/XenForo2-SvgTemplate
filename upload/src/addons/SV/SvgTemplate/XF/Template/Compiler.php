@@ -12,7 +12,7 @@ class Compiler extends \XF\Template\Compiler
 {
     public $previousCode = null;
 
-    public function compileAst(Ast $ast, Language $language = null)
+    public function compileAst(Ast $ast, ?Language $language = null)
     {
         $code = parent::compileAst($ast, $language);
 

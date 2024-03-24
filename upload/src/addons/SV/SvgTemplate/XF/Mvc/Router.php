@@ -24,7 +24,7 @@ class Router extends XFCP_Router
         $this->skipSvgTemplateRouterIntegration = empty(\XF::options()->svSvgTemplateRouterIntegration);
     }
 
-    public function routeToController($path, Request $request = null)
+    public function routeToController($path, ?Request $request = null)
     {
         // if $request is null, we're probably just testing a link
         if ($request === null || $this->skipSvgTemplateRouterIntegration)

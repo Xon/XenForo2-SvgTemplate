@@ -14,7 +14,7 @@ class UnsupportedExtensionProvidedException extends \InvalidArgumentException
      */
     protected $templateName;
 
-    public function __construct(string $templateName, $code = 0, Throwable $previous = null)
+    public function __construct(string $templateName, $code = 0, ?Throwable $previous = null)
     {
         $this->templateName = $templateName;
 

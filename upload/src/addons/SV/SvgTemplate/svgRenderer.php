@@ -86,7 +86,7 @@ class svgRenderer extends CssRenderer
         return $this->inputModifiedDate;
     }
 
-    public function setInputModifiedDate(int $value = null): void
+    public function setInputModifiedDate(?int $value = null): void
     {
         $this->inputModifiedDate = $value;
     }
