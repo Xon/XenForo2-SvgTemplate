@@ -3,18 +3,19 @@
     "title": "SVG Template",
     "description": "SVG as Templates",
     "version_id": 1696955906,
-    "version_string": "2.5.2",
+    "version_string": "2.6.0",
     "dev": "Xon",
     "dev_url": "https://atelieraphelion.com",
     "faq_url": "",
     "support_url": "https://xenforo.com/community/resources/svg-template-by-xon.6647/",
     "extra_urls": {
+        "License": "https://atelieraphelion.com/products/svg-template.169/copyright",
         "Add-on site": "https://atelieraphelion.com/products/svg-template.169/"
     },
     "require": {
         "SV/StandardLib": [
-            2001180000,
-            "Standard Library by Xon v1.18.0+"
+            2001190000,
+            "Standard Library by Xon v1.19.0+"
         ],
         "XF": [
             "2.2.0",
@@ -31,9 +32,9 @@
             "PHP ImageMagick Extension"
         ],
         "SV/RedisCache": [
-            "2.0.0",
-            "Redis Cache v2.0.0",
-            false
+            "2.17.0",
+            "Redis Cache v2.17.0",
+            true
         ],
         "SV/BrowserDetection": [
             "2.1.0",
