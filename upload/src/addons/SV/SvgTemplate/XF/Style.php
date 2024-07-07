@@ -50,7 +50,7 @@ class Style extends XFCP_Style
         $this->injectSvgStylePropertyBits();
     }
 
-    public function injectSvgStylePropertyBits()
+    public function injectSvgStylePropertyBits(): void
     {
         $this->todoReplacement = false;
 
@@ -78,36 +78,33 @@ class Style extends XFCP_Style
             {
                 foreach($property as &$component)
                 {
-                    if (!is_string($component))
+                    if (is_string($component))
                     {
-                        continue;
-                    }
-                    $changes = false;
-                    $data = $regexFunc($component);
-                    if ($changes && $data !== null)
-                    {
-                        $component = $data;
+                        $changes = false;
+                        $data = $regexFunc($component);
+                        if ($changes && $data !== null)
+                        {
+                            $component = $data;
+                        }
                     }
                 }
                 if (array_key_exists('variables', $property) && is_array($property['variables']))
                 {
                     foreach($property['variables'] as &$variable)
                     {
-                        if (!is_string($variable))
+                        if (is_string($variable))
                         {
-                            continue;
-                        }
-
-                        $changes = false;
-                        $data = $regexFunc($variable);
-                        if ($changes && $data !== null)
-                        {
-                            $variable = $data;
+                            $changes = false;
+                            $data = $regexFunc($variable);
+                            if ($changes && $data !== null)
+                            {
+                                $variable = $data;
+                            }
                         }
                     }
                 }
             }
-            else
+            else if (is_string($property))
             {
                 $changes = false;
                 $data = $regexFunc($property);
