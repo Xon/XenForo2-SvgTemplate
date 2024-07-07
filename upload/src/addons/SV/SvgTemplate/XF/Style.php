@@ -24,13 +24,13 @@ class Style extends XFCP_Style
         return parent::getProperty($name, $fallback);
     }
 
-    public function getCssProperty($name, $filters = null)
+    public function getPropertyVariation(string $name, string $variation,  $fallback = '')
     {
         if ($this->todoReplacement)
         {
             $this->injectStylePropertyBits();
         }
-        return parent::getCssProperty($name, $filters);
+        return parent::getPropertyVariation($name, $fallback);
     }
 
     public function getProperties()
