@@ -6,6 +6,7 @@
 namespace SV\SvgTemplate\XF;
 
 use SV\SvgTemplate\Globals;
+use function array_key_exists;
 use function is_callable, is_array, preg_replace_callback;
 use function is_string;
 
@@ -71,7 +72,6 @@ class Style extends XFCP_Style
             }, $component);
         };
 
-        $isXF23 = \XF::$versionId >= 2030000;
         foreach($this->properties as &$property)
         {
             if (is_array($property))
@@ -87,6 +87,23 @@ class Style extends XFCP_Style
                     if ($changes && $data !== null)
                     {
                         $component = $data;
+                    }
+                }
+                if (array_key_exists('variables', $property) && is_array($property['variables']))
+                {
+                    foreach($property['variables'] as &$variable)
+                    {
+                        if (!is_string($variable))
+                        {
+                            continue;
+                        }
+
+                        $changes = false;
+                        $data = $regexFunc($variable);
+                        if ($changes && $data !== null)
+                        {
+                            $variable = $data;
+                        }
                     }
                 }
             }
