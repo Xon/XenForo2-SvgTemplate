@@ -31,7 +31,7 @@ class Style extends XFCP_Style
         {
             $this->injectSvgStylePropertyBits();
         }
-        return parent::getPropertyVariation($name, $fallback);
+        return parent::getPropertyVariation($name, $variation, $fallback);
     }
 
     public function getProperties()
