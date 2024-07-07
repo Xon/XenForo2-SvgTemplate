@@ -19,7 +19,7 @@ class Style extends XFCP_Style
     {
         if ($this->todoReplacement)
         {
-            $this->injectStylePropertyBits();
+            $this->injectSvgStylePropertyBits();
         }
         return parent::getProperty($name, $fallback);
     }
@@ -28,7 +28,7 @@ class Style extends XFCP_Style
     {
         if ($this->todoReplacement)
         {
-            $this->injectStylePropertyBits();
+            $this->injectSvgStylePropertyBits();
         }
         return parent::getPropertyVariation($name, $fallback);
     }
@@ -37,7 +37,7 @@ class Style extends XFCP_Style
     {
         if ($this->todoReplacement)
         {
-            $this->injectStylePropertyBits();
+            $this->injectSvgStylePropertyBits();
         }
         parent::getProperties();
     }
@@ -45,10 +45,10 @@ class Style extends XFCP_Style
     public function setProperties(array $properties)
     {
         parent::setProperties($properties);
-        $this->injectStylePropertyBits();
+        $this->injectSvgStylePropertyBits();
     }
 
-    public function injectStylePropertyBits()
+    public function injectSvgStylePropertyBits()
     {
         $this->todoReplacement = false;
 
