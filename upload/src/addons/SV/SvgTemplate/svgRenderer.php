@@ -266,7 +266,7 @@ class svgRenderer extends CssRenderer
         $languageId = $templater->getLanguage()->getId();
 
         /** @var Template $template */
-        $template = $this->app->em()->instantiateEntity('XF:Template', [
+        $template = \SV\StandardLib\Helper::instantiateEntity(\XF\Entity\Template::class, [
             'template_id' => -1,
             'title' => $tmpTemplateName,
             'type' => 'public',

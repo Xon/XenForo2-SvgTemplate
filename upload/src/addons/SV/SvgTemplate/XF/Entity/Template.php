@@ -50,7 +50,7 @@ class Template extends XFCP_Template
      */
     protected function validateTemplateText($template, $forceValid = false, &$ast = null, &$error = null)
     {
-        $app = $this->app();
+        $app = \XF::app();
         if (!$this->isSvgTemplateForSv())
         {
             return parent::validateTemplateText($template, $forceValid, $ast, $error);
@@ -75,7 +75,7 @@ class Template extends XFCP_Template
         finally
         {
             /** @var Compiler $compiler */
-            $compiler = $this->app()->templateCompiler();
+            $compiler = \XF::app()->templateCompiler();
 
             $app->container()->offsetUnset('templateCompiler');
             $app->container()->set('templateCompiler', $originalTemplateCompiler);
@@ -93,7 +93,7 @@ class Template extends XFCP_Template
             $code = $compiler->previousCode ?? null;
             if (!$code)
             {
-                $compiler = $this->app()->templateCompiler();
+                $compiler = \XF::app()->templateCompiler();
                 $code = $compiler->compile($template);
             }
 
@@ -103,11 +103,11 @@ class Template extends XFCP_Template
             try
             {
                 /** @var User $userRepo */
-                $userRepo = $this->repository('XF:User');
+                $userRepo = \SV\StandardLib\Helper::repository(\XF\Repository\User::class);
                 $guestUser = $userRepo->getGuestUser();
                 $output = \XF::asVisitor($guestUser, function () use ($code, $app) {
 
-                    $renderer = svgRenderer::factory($this->app());
+                    $renderer = svgRenderer::factory(\XF::app());
                     $renderer->setStyle($app->style($this->style_id));
 
                     return $renderer->renderTemplateRaw($this->title, $code);

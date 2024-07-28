@@ -23,7 +23,7 @@ class Svg extends Repository
 
     public function isSvg2PngEnabled() : bool
     {
-        $renderSvgAsPng = $this->app()->options()->svSvgTemplate_renderSvgAsPng ?? [];
+        $renderSvgAsPng = \XF::app()->options()->svSvgTemplate_renderSvgAsPng ?? [];
         $conversationMethod = $renderSvgAsPng['type'] ?? '';
         switch($conversationMethod)
         {
@@ -63,7 +63,7 @@ class Svg extends Repository
             return '';
         }
 
-        $renderSvgAsPng = $this->app()->options()->svSvgTemplate_renderSvgAsPng ?? [];
+        $renderSvgAsPng = \XF::app()->options()->svSvgTemplate_renderSvgAsPng ?? [];
         $conversationMethod = $renderSvgAsPng['type'] ?? '';
         switch($conversationMethod)
         {
@@ -255,7 +255,7 @@ class Svg extends Repository
         $app = \XF::app();
 
         $useFriendlyUrls = $app->options()->useFriendlyUrls;
-        $style = $templater->getStyle() ?: $this->app()->style();
+        $style = $templater->getStyle() ?: \XF::app()->style();
         $styleId = $style->getId();
         $languageId = $templater->getLanguage()->getId();
         $lastModified = $style->getLastModified();

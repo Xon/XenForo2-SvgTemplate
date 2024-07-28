@@ -20,7 +20,7 @@ class TemplaterHelper extends XFCP_TemplaterHelper
 
     public function setup()
     {
-        $this->svSvgRepo = $this->app->repository('SV\SvgTemplate:Svg');
+        $this->svSvgRepo = \SV\StandardLib\Helper::repository(\SV\SvgTemplate\Repository\Svg::class);
         $this->svPngSupportEnabled = $this->svSvgRepo->isSvg2PngEnabled();
 
         parent::setup();

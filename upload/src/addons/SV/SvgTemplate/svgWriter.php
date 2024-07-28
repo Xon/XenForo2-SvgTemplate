@@ -137,14 +137,14 @@ class svgWriter extends CssWriter
         }
 
         $cacheKey = $cacheObj = $img = null;
-        $caching = $this->app()->options()->svSvgTemplate_cacheRenderedSvg ?? false;
+        $caching = \XF::app()->options()->svSvgTemplate_cacheRenderedSvg ?? false;
         if ($caching)
         {
             $cacheKey = 'svSvg_Png_' . md5($output);
-            $cacheObj = $this->app()->cache('sv-svg-img', false);
+            $cacheObj = \XF::app()->cache('sv-svg-img', false);
             if (!$cacheObj)
             {
-                $cacheObj = $this->app()->cache('css', false);
+                $cacheObj = \XF::app()->cache('css', false);
             }
         }
 
@@ -156,7 +156,7 @@ class svgWriter extends CssWriter
         if (!$img)
         {
             /** @var SvgRepo $svgRepo */
-            $svgRepo = \XF::repository('SV\SvgTemplate:Svg');
+            $svgRepo = \SV\StandardLib\Helper::repository(\SV\SvgTemplate\Repository\Svg::class);
             $img = $svgRepo->convertSvg2Png($output);
 
             if ($cacheObj)

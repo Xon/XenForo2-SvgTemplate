@@ -22,7 +22,7 @@ class RenderSvgAsPng extends AbstractOption
     protected static function getOptionTemplateParams(OptionEntity $option) : array
     {
         /** @var SvgRepo $svgRepo */
-        $svgRepo = \XF::repository('SV\SvgTemplate:Svg');
+        $svgRepo = \SV\StandardLib\Helper::repository(\SV\SvgTemplate\Repository\Svg::class);
 
         $params = [
             'procOpenCallStatus' => is_callable('proc_open'),
@@ -63,7 +63,7 @@ class RenderSvgAsPng extends AbstractOption
             if ($oldValue !== $option->option_value)
             {
                 /** @var Style $styleRepo */
-                $styleRepo = \XF::repository('XF:Style');
+                $styleRepo = \SV\StandardLib\Helper::repository(\XF\Repository\Style::class);
                 $styleRepo->updateAllStylesLastModifiedDateLater();
             }
         });

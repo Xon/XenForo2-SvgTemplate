@@ -44,7 +44,7 @@ class Setup extends AbstractSetup
         }
 
         /** @var ClassExtension $classExtension */
-        $classExtension = \XF::finder('XF:ClassExtension')
+        $classExtension = \SV\StandardLib\Helper::finder(\XF\Finder\ClassExtension::class)
                              ->where('from_class', '=', 'XF\Mvc\Router')
                              ->where('to_class', '=', 'SV\SvgTemplate\XF\Mvc\Router')
                              ->fetchOne();

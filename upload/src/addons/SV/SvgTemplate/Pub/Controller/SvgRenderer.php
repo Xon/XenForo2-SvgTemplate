@@ -11,7 +11,7 @@ class SvgRenderer extends AbstractController
     /** @noinspection PhpFullyQualifiedNameUsageInspection */
     public function actionIndex(ParameterBag $params): AbstractReply
     {
-        $app = $this->app();
+        $app = \XF::app();
         $request = $app->request();
         $input = $params->params();
 
