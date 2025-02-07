@@ -127,7 +127,7 @@ Explicit usage in templates;
         <img src="{{ getSvgUrlAs('example.svg', 'svg') }}"/>
     </xf:if>
 <xf:else />
-    <i class="fa fa-stop" />
+    <xf:fa icon="fa-stop" />
 </xf:if>
 ```
 
