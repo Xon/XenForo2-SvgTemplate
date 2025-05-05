@@ -9,6 +9,8 @@ use SV\BrowserDetection\Listener;
 use SV\StandardLib\Helper;
 use SV\SvgTemplate\XF\Template\Exception\UnsupportedExtensionProvidedException;
 use Symfony\Component\Process\Process;
+use XF\Entity\ClassExtension as ClassExtensionEntity;
+use XF\Finder\ClassExtension as ClassExtensionFinder;
 use XF\Mvc\Entity\Repository;
 use XF\Template\Templater;
 use XF\Util\File;
@@ -297,5 +299,21 @@ class Svg extends Repository
         $urlMode = \XF::$versionId >= 2020371 ? 'full' : 'canonical';
 
         return $templater->fnBaseUrl($templater, $escape, $url, $urlMode);
+    }
+
+    public function syncSvgRouterIntegrationOption(?bool $value = null): void
+    {
+        $value = $value ?? \XF::options()->svSvgTemplateRouterIntegration ?? true;
+
+        /** @var ClassExtensionEntity|null $classExtension */
+        $classExtension = Helper::finder(ClassExtensionFinder::class)
+                                ->where('from_class', '=', 'XF\Mvc\Router')
+                                ->where('to_class', '=', 'SV\SvgTemplate\XF\Mvc\Router')
+                                ->fetchOne();
+        if ($classExtension !== null)
+        {
+            $classExtension->active = $value;
+            $classExtension->saveIfChanged();
+        }
     }
 }

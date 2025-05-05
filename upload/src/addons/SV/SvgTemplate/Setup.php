@@ -3,13 +3,12 @@
 namespace SV\SvgTemplate;
 
 use Imagick;
-use SV\StandardLib\Helper;
 use SV\StandardLib\InstallerHelper;
+use SV\SvgTemplate\Repository\Svg as SvgRepository;
 use XF\AddOn\AbstractSetup;
 use XF\AddOn\StepRunnerInstallTrait;
 use XF\AddOn\StepRunnerUninstallTrait;
 use XF\AddOn\StepRunnerUpgradeTrait;
-use XF\Finder\ClassExtension as ClassExtensionFinder;
 use function extension_loaded, is_callable;
 
 /**
@@ -28,32 +27,13 @@ class Setup extends AbstractSetup
     public function postInstall(array &$stateChanges): void
     {
         parent::postInstall($stateChanges);
-        $this->syncSvgRouterIntegrationOption();
+        SvgRepository::get()->syncSvgRouterIntegrationOption();
     }
 
     public function postUpgrade($previousVersion, array &$stateChanges): void
     {
         parent::postUpgrade($previousVersion, $stateChanges);
-        $this->syncSvgRouterIntegrationOption();
-    }
-
-    protected function syncSvgRouterIntegrationOption(): void
-    {
-        $options = \XF::options();
-        if (!$options->offsetExists('svSvgTemplateRouterIntegration'))
-        {
-            return;
-        }
-
-        $classExtension = Helper::finder(ClassExtensionFinder::class)
-                                ->where('from_class', '=', 'XF\Mvc\Router')
-                                ->where('to_class', '=', 'SV\SvgTemplate\XF\Mvc\Router')
-                                ->fetchOne();
-        if ($classExtension)
-        {
-            $classExtension->active = (bool)$options->svSvgTemplateRouterIntegration;
-            $classExtension->saveIfChanged();
-        }
+        SvgRepository::get()->syncSvgRouterIntegrationOption();
     }
 
     /**
