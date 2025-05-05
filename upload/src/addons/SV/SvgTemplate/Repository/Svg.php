@@ -217,7 +217,7 @@ class Svg extends Repository
             throw new \LogicException('$templateName is required');
         }
 
-        $parts = pathinfo($template);
+        $parts = @pathinfo($template);
         $extension = $parts['extension'] ?? '';
         $dirname = $parts['dirname'] ?? '';
         $filename = $parts['filename'] ?? $template;
@@ -242,6 +242,12 @@ class Svg extends Repository
             || ($dirname !== '' && $dirname !== '.') // contains path info
         )
         {
+            if (!$pngSupport && $extension === 'png' && \XF::$debugMode)
+            {
+                \XF::logError("Requesting a png for {$filename}.svg, but is svg => png transcoding is not enabled");
+                return '';
+            }
+
             if ($forceExtension)
             {
                 return '';
