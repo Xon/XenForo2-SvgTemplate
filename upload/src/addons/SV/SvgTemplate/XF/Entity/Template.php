@@ -5,17 +5,22 @@
 
 namespace SV\SvgTemplate\XF\Entity;
 
+use DOMDocument;
+use SV\StandardLib\Helper;
 use SV\SvgTemplate\Exception\UnableToRewriteSvgException;
 use SV\SvgTemplate\svgRenderer;
 use SV\SvgTemplate\XF\Template\Compiler;
+use Throwable;
 use XF\Phrase;
-use XF\Repository\User;
+use XF\Repository\User as UserRepository;
 use XF\Template\Compiler\Ast as TemplateCompilerAst;
+use function count;
 use function strlen, is_string, explode;
 use function substr_compare;
 
 /**
  * @since 2.3.0 rc5
+ * @extends \XF\Entity\Template
  */
 class Template extends XFCP_Template
 {
@@ -102,8 +107,7 @@ class Template extends XFCP_Template
 
             try
             {
-                /** @var User $userRepo */
-                $userRepo = \SV\StandardLib\Helper::repository(\XF\Repository\User::class);
+                $userRepo = Helper::repository(UserRepository::class);
                 $guestUser = $userRepo->getGuestUser();
                 $output = \XF::asVisitor($guestUser, function () use ($code, $app) {
 
@@ -115,7 +119,7 @@ class Template extends XFCP_Template
 
                 if ($output)
                 {
-                    $dom = new \DOMDocument();
+                    $dom = new DOMDocument();
                     $dom->loadXML('<?xml version="1.0" encoding="UTF-8" standalone="no" ?>' . $output, LIBXML_NOBLANKS | LIBXML_NONET | LIBXML_NSCLEAN | LIBXML_NOXMLDECL);
                     $output = $dom->saveXML();
                     $isValidSvg = is_string($output) && strlen($output) !== 0;
@@ -125,7 +129,7 @@ class Template extends XFCP_Template
             {
                 $exceptionMsg = $exception->getMessage();
             }
-            catch (\Throwable $exception)
+            catch (Throwable $exception)
             {
                 $exceptionMsg = $exception->getMessage();
                 $exceptionMsgParts = explode(': ', $exceptionMsg);

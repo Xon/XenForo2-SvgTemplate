@@ -1,7 +1,4 @@
 <?php
-/**
- * @noinspection PhpMissingReturnTypeInspection
- */
 
 namespace SV\SvgTemplate\XF;
 
@@ -11,7 +8,7 @@ use function is_callable, is_array, preg_replace_callback;
 use function is_string;
 
 /**
- * Extends \XF\Style
+ * @extends \XF\Style
  */
 class Style extends XFCP_Style
 {
@@ -64,7 +61,7 @@ class Style extends XFCP_Style
         }
 
         $regexFunc = function (string $component) use ($templater, $templaterHelper, &$changes) {
-            return preg_replace_callback("/{{\s*getSvgUrl(?:as)?\s*\(\s*'([^']+)'\s*(?:,\s*'([^']+)'\s*)?\)\s*}}/siux", function ($match) use ($templater, $templaterHelper, &$changes) {
+            return preg_replace_callback("/{{\s*getSvgUrl(?:as)?\s*\(\s*'([^']+)'\s*(?:,\s*'([^']+)'\s*)?\)\s*}}/iux", function ($match) use ($templater, $templaterHelper, &$changes) {
                 $extension = $match[2] ?? '';
                 $output = $templaterHelper->fnGetSvgUrlAs($templater, $escape, $match[1], $extension);
                 $changes = $output !== $match[1];

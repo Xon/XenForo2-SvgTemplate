@@ -5,12 +5,14 @@
 
 namespace SV\SvgTemplate;
 
-use SV\SvgTemplate\Repository\Svg as SvgRepo;
-use XF\App;
+use SV\StandardLib\Helper;
+use SV\SvgTemplate\Repository\Svg as SvgRepository;
 use XF\App as BaseApp;
 use XF\CssWriter;
 use XF\Http\ResponseStream;
 use XF\Http\Response;
+use function ini_set;
+use function is_string;
 use function strpos, gzdecode, md5;
 
 /**
@@ -21,11 +23,9 @@ class svgWriter extends CssWriter
     /** @var int */
     public const PNG_CACHE_TIME = 3600; // 1 hour
 
-    public static function factory(App $app, svgRenderer $renderer): self
+    public static function factory(BaseApp $app, svgRenderer $renderer): self
     {
-        $writer = $app->extendClass(svgWriter::class);
-
-        return new $writer($app, $renderer);
+        return Helper::newExtendedClass(svgWriter::class, $app, $renderer);
     }
 
     public function run(array $templates, $styleId, $languageId, $validation = null, ?int $date = null): Response
@@ -102,7 +102,7 @@ class svgWriter extends CssWriter
                 $response->compressIfAble(false);
                 try
                 {
-                    @\ini_set('zlib.output_compression', 'Off');
+                    @ini_set('zlib.output_compression', 'Off');
                 }
                 catch (\Throwable $e) {}
                 if (!$this->isRenderingPng())
@@ -137,7 +137,7 @@ class svgWriter extends CssWriter
         }
 
         $cacheKey = $cacheObj = $img = null;
-        $caching = \XF::app()->options()->svSvgTemplate_cacheRenderedSvg ?? false;
+        $caching = \XF::options()->svSvgTemplate_cacheRenderedSvg ?? false;
         if ($caching)
         {
             $cacheKey = 'svSvg_Png_' . md5($output);
@@ -155,8 +155,7 @@ class svgWriter extends CssWriter
 
         if (!$img)
         {
-            /** @var SvgRepo $svgRepo */
-            $svgRepo = \SV\StandardLib\Helper::repository(\SV\SvgTemplate\Repository\Svg::class);
+            $svgRepo = SvgRepository::get();
             $img = $svgRepo->convertSvg2Png($output);
 
             if ($cacheObj)

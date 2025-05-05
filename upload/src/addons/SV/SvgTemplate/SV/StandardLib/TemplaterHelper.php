@@ -2,25 +2,27 @@
 
 namespace SV\SvgTemplate\SV\StandardLib;
 
-use SV\SvgTemplate\Repository\Svg;
+use SV\SvgTemplate\Repository\Svg as SvgRepository;
 use XF\Mvc\Reply\AbstractReply;
 use XF\PreEscaped;
 use XF\Template\Templater as BaseTemplater;
 
 /**
- * Extends \SV\StandardLib\TemplaterHelper
+ * @extends \SV\StandardLib\TemplaterHelper
  */
 class TemplaterHelper extends XFCP_TemplaterHelper
 {
+    /** @var bool */
     public $automaticSvgUrlWriting = true;
+    /** @var bool */
     public $svPngSupportEnabled = false;
 
-    /** @var Svg */
+    /** @var SvgRepository */
     protected $svSvgRepo;
 
     public function setup()
     {
-        $this->svSvgRepo = \SV\StandardLib\Helper::repository(\SV\SvgTemplate\Repository\Svg::class);
+        $this->svSvgRepo = SvgRepository::get();
         $this->svPngSupportEnabled = $this->svSvgRepo->isSvg2PngEnabled();
 
         parent::setup();

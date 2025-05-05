@@ -10,7 +10,7 @@ use XF\Mvc\RouteMatch;
 use function strncasecmp, strlen, preg_match;
 
 /**
- * Extends \XF\Mvc\Router
+ * @extends \XF\Mvc\Router
  */
 class Router extends XFCP_Router
 {
@@ -21,7 +21,7 @@ class Router extends XFCP_Router
     public function __construct($linkFormatter = null, array $routes = [])
     {
         parent::__construct($linkFormatter, $routes);
-        $this->skipSvgTemplateRouterIntegration = empty(\XF::options()->svSvgTemplateRouterIntegration);
+        $this->skipSvgTemplateRouterIntegration = !(\XF::options()->svSvgTemplateRouterIntegration ?? false);
     }
 
     public function routeToController($path, ?Request $request = null)

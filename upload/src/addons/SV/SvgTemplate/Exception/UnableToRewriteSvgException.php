@@ -2,12 +2,13 @@
 
 namespace SV\SvgTemplate\Exception;
 
+use InvalidArgumentException;
 use Throwable;
 
 /**
  * @since 2.3.0 rc1
  */
-class UnableToRewriteSvgException extends \InvalidArgumentException
+class UnableToRewriteSvgException extends InvalidArgumentException
 {
     /**
      * @var string

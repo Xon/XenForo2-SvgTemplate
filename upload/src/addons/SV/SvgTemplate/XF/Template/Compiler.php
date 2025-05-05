@@ -10,6 +10,7 @@ use XF\Template\Compiler\Ast;
 
 class Compiler extends \XF\Template\Compiler
 {
+    /** @var string|null */
     public $previousCode = null;
 
     public function compileAst(Ast $ast, ?Language $language = null)

@@ -2,28 +2,36 @@
 
 namespace SV\SvgTemplate\Repository;
 
+use Imagick;
+use ImagickPixel;
+use LogicException;
 use SV\BrowserDetection\Listener;
+use SV\StandardLib\Helper;
 use SV\SvgTemplate\XF\Template\Exception\UnsupportedExtensionProvidedException;
 use Symfony\Component\Process\Process;
 use XF\Mvc\Entity\Repository;
 use XF\Template\Templater;
 use XF\Util\File;
 use function array_key_exists, trim, strlen, pathinfo, system, file_get_contents,is_string, is_callable, extension_loaded, strtr, in_array;
+use function file_put_contents;
 use function unlink;
+use function urlencode;
 
 class Svg extends Repository
 {
+    public static function get(): self
+    {
+        return Helper::repository(self::class);
+    }
+
     public function isSvBrowserDetectionActive() : bool
     {
-        return array_key_exists(
-            'SV/BrowserDetection',
-            \XF::app()->container('addon.cache')
-        );
+        return array_key_exists('SV/BrowserDetection', \XF::app()->container('addon.cache'));
     }
 
     public function isSvg2PngEnabled() : bool
     {
-        $renderSvgAsPng = \XF::app()->options()->svSvgTemplate_renderSvgAsPng ?? [];
+        $renderSvgAsPng = \XF::options()->svSvgTemplate_renderSvgAsPng ?? [];
         $conversationMethod = $renderSvgAsPng['type'] ?? '';
         switch($conversationMethod)
         {
@@ -63,7 +71,7 @@ class Svg extends Repository
             return '';
         }
 
-        $renderSvgAsPng = \XF::app()->options()->svSvgTemplate_renderSvgAsPng ?? [];
+        $renderSvgAsPng = \XF::options()->svSvgTemplate_renderSvgAsPng ?? [];
         $conversationMethod = $renderSvgAsPng['type'] ?? '';
         switch($conversationMethod)
         {
@@ -101,12 +109,12 @@ class Svg extends Repository
             return false;
         }
 
-        if (!\Imagick::queryFormats('SVG'))
+        if (!Imagick::queryFormats('SVG'))
         {
             return false;
         }
 
-        if (!\Imagick::queryFormats('PNG'))
+        if (!Imagick::queryFormats('PNG'))
         {
             return false;
         }
@@ -116,13 +124,17 @@ class Svg extends Repository
 
     protected function convertSvg2PngImagick(string $output): string
     {
-        $im = new \Imagick();
-        $im->setBackgroundColor(new \ImagickPixel('transparent'));
+        $im = new Imagick();
+        $im->setBackgroundColor(new ImagickPixel('transparent'));
         $im->readImageBlob('<?xml version="1.0" encoding="UTF-8" standalone="no" ?>' . $output);
         $im->setImageFormat('png');
         $img = $im->getImageBlob();
         $im->clear();
-        $im->destroy();
+        if (is_callable([$im, 'destroy']))
+        {
+            /** @noinspection PhpDeprecationInspection */
+            $im->destroy();
+        }
 
         return $img;
     }
@@ -214,7 +226,7 @@ class Svg extends Repository
     {
         if (!$template)
         {
-            throw new \LogicException('$templateName is required');
+            throw new LogicException('$templateName is required');
         }
 
         $parts = @pathinfo($template);
@@ -258,9 +270,7 @@ class Svg extends Repository
 
         $template = $filename . '.' . $finalExtension;
 
-        $app = \XF::app();
-
-        $useFriendlyUrls = $app->options()->useFriendlyUrls;
+        $useFriendlyUrls = \XF::options()->useFriendlyUrls;
         $style = $templater->getStyle() ?: \XF::app()->style();
         $styleId = $style->getId();
         $languageId = $templater->getLanguage()->getId();

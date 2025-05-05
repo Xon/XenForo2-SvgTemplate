@@ -2,10 +2,11 @@
 
 namespace SV\SvgTemplate\XF\Entity;
 
-use XF\Entity\ClassExtension;
+use SV\StandardLib\Helper;
+use XF\Finder\ClassExtension as ClassExtensionFinder;
 
 /**
- * Extends \XF\Entity\Option
+ * @extends \XF\Entity\Option
  */
 class Option extends XFCP_Option
 {
@@ -15,11 +16,10 @@ class Option extends XFCP_Option
 
         if ($this->option_id === 'svSvgTemplateRouterIntegration' && $this->isChanged('option_value'))
         {
-            /** @var ClassExtension $classExtension */
-            $classExtension = \SV\StandardLib\Helper::finder(\XF\Finder\ClassExtension::class)
-                                 ->where('from_class', '=', 'XF\Mvc\Router')
-                                 ->where('to_class', '=', 'SV\SvgTemplate\XF\Mvc\Router')
-                                 ->fetchOne();
+            $classExtension = Helper::finder(ClassExtensionFinder::class)
+                                    ->where('from_class', '=', 'XF\Mvc\Router')
+                                    ->where('to_class', '=', 'SV\SvgTemplate\XF\Mvc\Router')
+                                    ->fetchOne();
             if ($classExtension)
             {
                 $classExtension->active = (bool)$this->option_value;

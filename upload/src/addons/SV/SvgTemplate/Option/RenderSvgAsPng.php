@@ -2,10 +2,12 @@
 
 namespace SV\SvgTemplate\Option;
 
-use SV\SvgTemplate\Repository\Svg as SvgRepo;
+use Imagick;
+use SV\StandardLib\Helper;
+use SV\SvgTemplate\Repository\Svg as SvgRepository;
 use XF\Entity\Option as OptionEntity;
 use XF\Option\AbstractOption;
-use XF\Repository\Style;
+use XF\Repository\Style as StyleRepository;
 use function is_callable, extension_loaded;
 
 /**
@@ -21,8 +23,7 @@ class RenderSvgAsPng extends AbstractOption
     /** @noinspection PhpUnusedParameterInspection */
     protected static function getOptionTemplateParams(OptionEntity $option) : array
     {
-        /** @var SvgRepo $svgRepo */
-        $svgRepo = \SV\StandardLib\Helper::repository(\SV\SvgTemplate\Repository\Svg::class);
+        $svgRepo = SvgRepository::get();
 
         $params = [
             'procOpenCallStatus' => is_callable('proc_open'),
@@ -35,8 +36,8 @@ class RenderSvgAsPng extends AbstractOption
 
         if ($params['imagickStatus'])
         {
-            $params['imagickSvgFormatStatus'] = \Imagick::queryFormats('SVG');
-            $params['imagickPngFormatStatus'] = \Imagick::queryFormats('PNG');
+            $params['imagickSvgFormatStatus'] = Imagick::queryFormats('SVG');
+            $params['imagickPngFormatStatus'] = Imagick::queryFormats('PNG');
         }
 
         return $params;
@@ -62,8 +63,7 @@ class RenderSvgAsPng extends AbstractOption
         \XF::runLater(function() use ($oldValue, $option) {
             if ($oldValue !== $option->option_value)
             {
-                /** @var Style $styleRepo */
-                $styleRepo = \SV\StandardLib\Helper::repository(\XF\Repository\Style::class);
+                $styleRepo = Helper::repository(StyleRepository::class);
                 $styleRepo->updateAllStylesLastModifiedDateLater();
             }
         });

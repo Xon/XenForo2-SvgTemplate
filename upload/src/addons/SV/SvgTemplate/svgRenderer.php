@@ -6,22 +6,27 @@
 
 namespace SV\SvgTemplate;
 
+use DOMAttr;
+use DOMDocument;
+use DOMNode;
+use Exception;
+use Less_Parser;
 use SV\RedisCache\RawResponseText;
 use SV\RedisCache\Redis;
-use SV\RedisCache\Repository\Redis as RedisRepo;
+use SV\RedisCache\Repository\Redis as RedisRepository;
+use SV\StandardLib\Helper;
 use SV\SvgTemplate\Exception\UnableToRewriteSvgException;
-use XF\App;
+use XF\App as BaseApp;
 use XF\CssRenderer;
-use XF\Entity\Template;
+use XF\Entity\Template as TemplateEntity;
 use XF\Http\ResponseStream;
 use XF\Template\Templater;
 use XF\Util\File;
+use function gzdecode;
+use function libxml_clear_errors;
+use function libxml_use_internal_errors;
 use function preg_match, trim, strlen, is_array, reset, is_string, array_unique, sort, md5, implode, strval, gzencode, is_callable;
 
-/**
- * Class svgRenderer
- *
- */
 class svgRenderer extends CssRenderer
 {
     /** @var int */
@@ -38,7 +43,7 @@ class svgRenderer extends CssRenderer
     /** @var Redis */
     protected $redisCache = null;
 
-    public function __construct(App $app, Templater $templater)
+    public function __construct(BaseApp $app, Templater $templater)
     {
         $cache = \XF::app()->cache('css');
         parent::__construct($app, $templater, $cache);
@@ -51,14 +56,12 @@ class svgRenderer extends CssRenderer
             $this->allowCached = true;
         }
 
-        $this->redisCache = \XF::isAddOnActive('SV/RedisCache') ? RedisRepo::get()->getRedisObj($cache) : null;
+        $this->redisCache = Helper::isAddOnActive('SV/RedisCache') ? RedisRepository::get()->getRedisObj($cache) : null;
     }
 
-    public static function factory(App $app, ?Templater $templater = null): self
+    public static function factory(BaseApp $app, ?Templater $templater = null): self
     {
-        $rendererClass = $app->extendClass(svgRenderer::class);
-
-        return new $rendererClass($app, $templater ?? $app->templater());
+        return Helper::newExtendedClass(svgRenderer::class, $app, $templater ?? $app->templater());
     }
 
     public function setTemplater(Templater $templater): void
@@ -174,7 +177,7 @@ class svgRenderer extends CssRenderer
         }
 
         // client doesn't support compression, so decompress before sending it
-        return $output ? @\gzdecode($output) : '';
+        return $output ? @gzdecode($output) : '';
     }
 
     protected function getFinalCacheKey(array $templates): string
@@ -265,8 +268,7 @@ class svgRenderer extends CssRenderer
         $styleId = (int)$templater->getStyleId();
         $languageId = $templater->getLanguage()->getId();
 
-        /** @var Template $template */
-        $template = \SV\StandardLib\Helper::instantiateEntity(\XF\Entity\Template::class, [
+        $template = Helper::instantiateEntity(TemplateEntity::class, [
             'template_id' => -1,
             'title' => $tmpTemplateName,
             'type' => 'public',
@@ -328,7 +330,7 @@ class svgRenderer extends CssRenderer
         }
     }
 
-    protected function getLessParser(): \Less_Parser
+    protected function getLessParser(): Less_Parser
     {
         if ($this->lessParser === null)
         {
@@ -336,20 +338,20 @@ class svgRenderer extends CssRenderer
                 'compress' => $this->compactSvg,
                 'indentation' => ' ',
             ];
-            $this->lessParser = new \Less_Parser($options);
+            $this->lessParser = new Less_Parser($options);
         }
 
         return $this->lessParser;
     }
 
-    protected function cleanNodeList(\DOMNode $parentNode, string &$styling): void
+    protected function cleanNodeList(DOMNode $parentNode, string &$styling): void
     {
         $compactSvg = $this->compactSvg;
         // iterate backwards as this allows removing elements, as the list is "dynamic"
         $nodeList = $parentNode->childNodes;
         for ($i = $nodeList->length - 1; $i >= 0; $i--)
         {
-            /** @var \DOMNode $node */
+            /** @var DOMNode $node */
             $node = $nodeList->item($i);
             $checkChildren = true;
             switch ($node->nodeType)
@@ -375,7 +377,7 @@ class svgRenderer extends CssRenderer
                             $attributes = $node->attributes;
                             for ($i2 = $attributes->length - 1; $i2 >= 0; $i2--)
                             {
-                                /** @var \DOMAttr $attribute */
+                                /** @var DOMAttr $attribute */
                                 $attribute = $attributes->item($i2);
                                 if (preg_match('#^(?:sodipodi:|inkscape:)#ui', $attribute->name))
                                 {
@@ -416,20 +418,20 @@ class svgRenderer extends CssRenderer
     protected function rewriteSvg(string $template, string $svg): string
     {
         // The svg format is just plain-text XML. so we can load, prune and save
-        $doc = new \DOMDocument();
+        $doc = new DOMDocument();
         $doc->preserveWhiteSpace = false;
-        \libxml_use_internal_errors(true);
+        libxml_use_internal_errors(true);
         try
         {
             $doc->loadXML($svg, LIBXML_NOBLANKS | LIBXML_NONET | LIBXML_NSCLEAN | LIBXML_NOXMLDECL);
         }
-        catch (\Exception $e)
+        catch (Exception $e)
         {
             throw new UnableToRewriteSvgException($template, $e->getMessage(), 0, $e);
         }
         finally
         {
-            \libxml_clear_errors();
+            libxml_clear_errors();
         }
 
         $rootElement = $doc->documentElement;

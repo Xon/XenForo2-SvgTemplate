@@ -11,8 +11,7 @@ use XF\App;
 use XF\Template\Templater;
 
 /**
- * Extends \XF\CssRenderer
- *
+ * @extends \XF\CssRenderer
  */
 class CssRenderer extends XFCP_CssRenderer
 {

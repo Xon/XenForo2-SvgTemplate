@@ -6,11 +6,6 @@ use SV\StandardLib\TemplaterHelper;
 use SV\SvgTemplate\SV\StandardLib\TemplaterHelper as ExtendedTemplaterHelper;
 use XF\Template\Templater;
 
-/**
- * Class Globals
- *
- * @package SV\SvgTemplate
- */
 abstract class Globals
 {
     private function __construct() { }

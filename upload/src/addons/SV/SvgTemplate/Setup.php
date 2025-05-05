@@ -2,12 +2,14 @@
 
 namespace SV\SvgTemplate;
 
+use Imagick;
+use SV\StandardLib\Helper;
 use SV\StandardLib\InstallerHelper;
 use XF\AddOn\AbstractSetup;
 use XF\AddOn\StepRunnerInstallTrait;
 use XF\AddOn\StepRunnerUninstallTrait;
 use XF\AddOn\StepRunnerUpgradeTrait;
-use XF\Entity\ClassExtension;
+use XF\Finder\ClassExtension as ClassExtensionFinder;
 use function extension_loaded, is_callable;
 
 /**
@@ -43,19 +45,16 @@ class Setup extends AbstractSetup
             return;
         }
 
-        /** @var ClassExtension $classExtension */
-        $classExtension = \SV\StandardLib\Helper::finder(\XF\Finder\ClassExtension::class)
-                             ->where('from_class', '=', 'XF\Mvc\Router')
-                             ->where('to_class', '=', 'SV\SvgTemplate\XF\Mvc\Router')
-                             ->fetchOne();
+        $classExtension = Helper::finder(ClassExtensionFinder::class)
+                                ->where('from_class', '=', 'XF\Mvc\Router')
+                                ->where('to_class', '=', 'SV\SvgTemplate\XF\Mvc\Router')
+                                ->fetchOne();
         if ($classExtension)
         {
             $classExtension->active = (bool)$options->svSvgTemplateRouterIntegration;
             $classExtension->saveIfChanged();
         }
     }
-
-    //proc_open
 
     /**
      * @param array $errors
@@ -68,11 +67,11 @@ class Setup extends AbstractSetup
 
         if (extension_loaded('imagick'))
         {
-            if (!\Imagick::queryFormats('PNG'))
+            if (!Imagick::queryFormats('PNG'))
             {
                 $warnings[] = 'imagick extension does not support PNGs, which is required to convert SVGs to PNGs using imagick';
             }
-            else if (!\Imagick::queryFormats('SVG'))
+            else if (!Imagick::queryFormats('SVG'))
             {
                 $warnings[] = 'imagick extension does not support SVGs, which is required to convert SVGs to PNGs using imagick';
             }
