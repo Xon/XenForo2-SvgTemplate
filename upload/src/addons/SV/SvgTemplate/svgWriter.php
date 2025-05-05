@@ -188,6 +188,9 @@ class svgWriter extends CssWriter
         return $response;
     }
 
+    /**
+     * @deprecated
+     */
     protected function app() : BaseApp
     {
         return $this->app;
