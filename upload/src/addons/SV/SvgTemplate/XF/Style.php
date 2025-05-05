@@ -23,6 +23,9 @@ class Style extends XFCP_Style
         return parent::getProperty($name, $fallback);
     }
 
+    /**
+     * XF2.3+
+     */
     public function getPropertyVariation(string $name, string $variation,  $fallback = '')
     {
         if ($this->todoReplacement)
