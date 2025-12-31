@@ -226,7 +226,7 @@ class Svg extends Repository
 
     public function getSvgUrl(Templater $templater, &$escape, string $template, bool $pngSupport, bool $autoUrlRewrite, bool $includeValidation, string $forceExtension): string
     {
-        if (!$template)
+        if ($template === '')
         {
             throw new LogicException('$templateName is required');
         }
