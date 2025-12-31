@@ -89,7 +89,7 @@ class Style extends XFCP_Style
             }, $component);
         };
 
-        $variableKey = static::VARIABLE_KEY ?? '';
+        $variableKey = \XF::$versionId >= 2030000 ? static::VARIABLE_KEY : '';
 
         foreach($this->properties as &$property)
         {
