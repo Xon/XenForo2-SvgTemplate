@@ -35,6 +35,7 @@ class Style extends XFCP_Style
         return parent::getPropertyVariation($name, $variation, $fallback);
     }
 
+    /** @noinspection PhpMissingReturnTypeInspection */
     public function getProperties()
     {
         if ($this->todoReplacement)
@@ -42,6 +43,15 @@ class Style extends XFCP_Style
             $this->injectSvgStylePropertyBits();
         }
         return parent::getProperties();
+    }
+
+    public function getVariationVariables(string $variation, bool $colors = false): array
+    {
+        if ($this->todoReplacement)
+        {
+            $this->injectSvgStylePropertyBits();
+        }
+        return parent::getVariationVariables($variation, $colors);
     }
 
     public function setProperties(array $properties)
@@ -63,14 +73,23 @@ class Style extends XFCP_Style
             return;
         }
 
-        $regexFunc = function (string $component) use ($templater, $templaterHelper, &$changes) {
-            return preg_replace_callback("/{{\s*getSvgUrl(?:as)?\s*\(\s*'([^']+)'\s*(?:,\s*'([^']+)'\s*)?\)\s*}}/iux", function ($match) use ($templater, $templaterHelper, &$changes) {
+        $seen = [];
+        $regexFunc = function (string $component) use ($templater, $templaterHelper, &$changes, &$seen) {
+            return preg_replace_callback("/{{\s*getSvgUrl(?:as)?\s*\(\s*'([^']+)'\s*(?:,\s*'([^']+)'\s*)?\)\s*}}/iux", function ($match) use ($templater, $templaterHelper, &$changes, &$seen) {
                 $extension = $match[2] ?? '';
-                $output = $templaterHelper->fnGetSvgUrlAs($templater, $escape, $match[1], $extension);
-                $changes = $output !== $match[1];
+                $template = $match[1];
+                $output = $seen[$template] ?? null;
+                if ($output === null)
+                {
+                    $output = $templaterHelper->fnGetSvgUrlAs($templater, $escape, $template, $extension);
+                    $seen[$template] = $output;
+                }
+                $changes = $output !== $template;
                 return $output;
             }, $component);
         };
+
+        $variableKey = static::VARIABLE_KEY ?? '';
 
         foreach($this->properties as &$property)
         {
@@ -78,7 +97,7 @@ class Style extends XFCP_Style
             {
                 foreach($property as &$component)
                 {
-                    if (is_string($component))
+                    if (is_string($component) && $component !== '')
                     {
                         $changes = false;
                         $data = $regexFunc($component);
@@ -88,23 +107,24 @@ class Style extends XFCP_Style
                         }
                     }
                 }
-                if (array_key_exists('variables', $property) && is_array($property['variables']))
+                $variants = $property[$variableKey] ?? null;
+                if (is_array($variants))
                 {
-                    foreach($property['variables'] as &$variable)
+                    foreach($variants as $key => $variable)
                     {
-                        if (is_string($variable))
+                        if (is_string($variable) && $variable !== '')
                         {
                             $changes = false;
                             $data = $regexFunc($variable);
                             if ($changes && $data !== null)
                             {
-                                $variable = $data;
+                                $property[$variableKey][$key] = $data;
                             }
                         }
                     }
                 }
             }
-            else if (is_string($property))
+            else if (is_string($property) && $property !== '')
             {
                 $changes = false;
                 $data = $regexFunc($property);
