@@ -233,7 +233,7 @@ class svgRenderer extends CssRenderer
         return [];
     }
 
-    protected function renderTemplates(array $templates, array $cached = [], array &$errors = null): string
+    protected function renderTemplates(array $templates, array $cached = [], ?array &$errors = null): string
     {
         $errors = [];
         $this->renderParams = $this->getRenderParams();
