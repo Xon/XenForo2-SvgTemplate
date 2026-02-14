@@ -7,15 +7,17 @@ namespace SV\SvgTemplate\XF\Mvc;
 
 use XF\Http\Request;
 use XF\Mvc\RouteMatch;
-use function strncasecmp, strlen, preg_match;
+use function preg_match;
+use function strlen;
+use function strncasecmp;
 
 /**
  * @extends \XF\Mvc\Router
  */
 class Router extends XFCP_Router
 {
-    protected $friendlySvgUrl = 'data/svg/';
-    protected $rawSvgUrl = 'svg.php';
+    protected $friendlySvgUrl                   = 'data/svg/';
+    protected $rawSvgUrl                        = 'svg.php';
     protected $skipSvgTemplateRouterIntegration = true;
 
     public function __construct($linkFormatter = null, array $routes = [])
@@ -39,7 +41,7 @@ class Router extends XFCP_Router
             if (preg_match('#^data/svg/(?<s>[^/]+)/(?<l>[^/]+)/(?<d>[^/]+)/(?<svg>[^\.]+\.(?:svg|png))$#i', $path, $matches))
             {
                 $input = $request->filter([
-                    'k' => 'str'
+                    'k' => 'str',
                 ]);
 
                 $match = new RouteMatch();
@@ -53,13 +55,13 @@ class Router extends XFCP_Router
         else if (strncasecmp($path, $this->rawSvgUrl, strlen($this->rawSvgUrl)) === 0)
         {
             $input = $request->filter([
-                'svg' => 'str',
-                's' => 'uint',
-                'l' => 'uint',
-                'k' => 'str',
-                'd' => 'uint',
+                'svg'      => 'str',
+                's'        => 'uint',
+                'l'        => 'uint',
+                'k'        => 'str',
+                'd'        => 'uint',
                 // XF1 arguments
-                'style' => 'uint',
+                'style'    => 'uint',
                 'langauge' => 'uint',
             ]);
             //XF1 arguments compatibility

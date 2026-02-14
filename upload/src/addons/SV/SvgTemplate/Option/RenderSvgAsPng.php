@@ -8,30 +8,31 @@ use SV\SvgTemplate\Repository\Svg as SvgRepository;
 use XF\Entity\Option as OptionEntity;
 use XF\Option\AbstractOption;
 use XF\Repository\Style as StyleRepository;
-use function is_callable, extension_loaded;
+use function extension_loaded;
+use function is_callable;
 
 /**
  * @since 2.3.0 rc1
  */
 class RenderSvgAsPng extends AbstractOption
 {
-    protected static function getOptionTemplateName(OptionEntity $option) : string
+    protected static function getOptionTemplateName(OptionEntity $option): string
     {
         return 'admin:option_template_' . $option->option_id;
     }
 
     /** @noinspection PhpUnusedParameterInspection */
-    protected static function getOptionTemplateParams(OptionEntity $option) : array
+    protected static function getOptionTemplateParams(OptionEntity $option): array
     {
         $svgRepo = SvgRepository::get();
 
         $params = [
-            'procOpenCallStatus' => is_callable('proc_open'),
-            'systemCallStatus' => is_callable('system'),
+            'procOpenCallStatus'     => is_callable('proc_open'),
+            'systemCallStatus'       => is_callable('system'),
             'browserDetectionStatus' => $svgRepo->isSvBrowserDetectionActive(),
-            'imagickStatus' => extension_loaded('imagick'),
+            'imagickStatus'          => extension_loaded('imagick'),
             'imagickSvgFormatStatus' => false,
-            'imagickPngFormatStatus' => false
+            'imagickPngFormatStatus' => false,
         ];
 
         if ($params['imagickStatus'])
@@ -43,7 +44,7 @@ class RenderSvgAsPng extends AbstractOption
         return $params;
     }
 
-    public static function renderOption(OptionEntity $option, array $htmlParams) : string
+    public static function renderOption(OptionEntity $option, array $htmlParams): string
     {
         $optionTemplate = static::getOptionTemplateName($option);
         $optionParams = static::getOptionTemplateParams($option);
@@ -60,7 +61,7 @@ class RenderSvgAsPng extends AbstractOption
         }
 
         $oldValue = $option->option_value;
-        \XF::runLater(function() use ($oldValue, $option) {
+        \XF::runLater(function () use ($oldValue, $option) {
             if ($oldValue !== $option->option_value)
             {
                 $styleRepo = Helper::repository(StyleRepository::class);

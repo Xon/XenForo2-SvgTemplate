@@ -15,7 +15,9 @@ use XF\Phrase;
 use XF\Repository\User as UserRepository;
 use XF\Template\Compiler\Ast as TemplateCompilerAst;
 use function count;
-use function strlen, is_string, explode;
+use function explode;
+use function is_string;
+use function strlen;
 use function substr_compare;
 
 /**
@@ -26,7 +28,7 @@ class Template extends XFCP_Template
 {
     public const SVG_TEMPLATE_NAME_SUFFIX_FOR_SV = '.svg';
 
-    protected function isSvgTemplateForSv() : bool
+    protected function isSvgTemplateForSv(): bool
     {
         $templateName = $this->title ?? '';
         $templateNameLength = strlen($templateName);
@@ -46,11 +48,10 @@ class Template extends XFCP_Template
     }
 
     /**
-     * @param string $template
-     * @param bool $forceValid
+     * @param string                   $template
+     * @param bool                     $forceValid
      * @param TemplateCompilerAst|null $ast
-     * @param Phrase|null $error
-     *
+     * @param Phrase|null              $error
      * @return bool
      */
     protected function validateTemplateText($template, $forceValid = false, &$ast = null, &$error = null)
@@ -65,12 +66,13 @@ class Template extends XFCP_Template
         {
             // svg templates must not be empty
             $error = \XF::phrase('svSvgTemplate_template_can_not_be_empty', ['template' => "{$this->type}:{$this->title}"]);
+
             return false;
         }
 
         // shim the template compiler, so we don't need to compile the templates multiple times
         $originalTemplateCompiler = $app->container()->getOriginal('templateCompiler');
-        $app->container()->set('templateCompiler', function() {
+        $app->container()->set('templateCompiler', function () {
             return new Compiler();
         });
         try
@@ -92,6 +94,7 @@ class Template extends XFCP_Template
             {
                 // svg templates must not be empty
                 $error = \XF::phrase('svSvgTemplate_template_can_not_be_empty', ['template' => "{$this->type}:{$this->title}"]);
+
                 return false;
             }
 

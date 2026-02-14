@@ -9,11 +9,13 @@ use SV\StandardLib\Helper;
 use SV\SvgTemplate\Repository\Svg as SvgRepository;
 use XF\App as BaseApp;
 use XF\CssWriter;
-use XF\Http\ResponseStream;
 use XF\Http\Response;
+use XF\Http\ResponseStream;
+use function gzdecode;
 use function ini_set;
 use function is_string;
-use function strpos, gzdecode, md5;
+use function md5;
+use function strpos;
 
 /**
  * @property svgRenderer $renderer
@@ -47,12 +49,12 @@ class svgWriter extends CssWriter
         return parent::run($templates, $styleId, $languageId, $validation);
     }
 
-    public function getRenderer() : svgRenderer
+    public function getRenderer(): svgRenderer
     {
         return $this->renderer;
     }
 
-    public function isRenderingPng() : bool
+    public function isRenderingPng(): bool
     {
         return $this->getRenderer()->isRenderingPng();
     }
@@ -104,7 +106,9 @@ class svgWriter extends CssWriter
                 {
                     @ini_set('zlib.output_compression', 'Off');
                 }
-                catch (\Throwable $e) {}
+                catch (\Throwable $e)
+                {
+                }
                 if (!$this->isRenderingPng())
                 {
                     $response->header('content-encoding', 'gzip');
@@ -191,7 +195,7 @@ class svgWriter extends CssWriter
     /**
      * @deprecated
      */
-    protected function app() : BaseApp
+    protected function app(): BaseApp
     {
         return $this->app;
     }

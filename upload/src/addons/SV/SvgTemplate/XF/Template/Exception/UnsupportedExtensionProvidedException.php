@@ -18,7 +18,7 @@ class UnsupportedExtensionProvidedException extends \InvalidArgumentException
     {
         $this->templateName = $templateName;
 
-        parent::__construct('Unsupported extension provided:'.$templateName, $code, $previous);
+        parent::__construct('Unsupported extension provided:' . $templateName, $code, $previous);
     }
 
     public function getTemplateName(): string

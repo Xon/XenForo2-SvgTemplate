@@ -9,14 +9,16 @@ use XF\AddOn\AbstractSetup;
 use XF\AddOn\StepRunnerInstallTrait;
 use XF\AddOn\StepRunnerUninstallTrait;
 use XF\AddOn\StepRunnerUpgradeTrait;
-use function extension_loaded, is_callable;
+use function extension_loaded;
+use function is_callable;
 
 /**
  * Add-on installation, upgrade, and uninstall routines.
  */
 class Setup extends AbstractSetup
 {
-    use InstallerHelper {
+    use InstallerHelper
+    {
         checkRequirements as protected checkRequirementsTrait;
     }
 

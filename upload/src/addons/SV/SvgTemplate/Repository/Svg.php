@@ -14,8 +14,18 @@ use XF\Finder\ClassExtension as ClassExtensionFinder;
 use XF\Mvc\Entity\Repository;
 use XF\Template\Templater;
 use XF\Util\File;
-use function array_key_exists, trim, strlen, pathinfo, system, file_get_contents,is_string, is_callable, extension_loaded, strtr, in_array;
+use function array_key_exists;
+use function extension_loaded;
+use function file_get_contents;
 use function file_put_contents;
+use function in_array;
+use function is_callable;
+use function is_string;
+use function pathinfo;
+use function strlen;
+use function strtr;
+use function system;
+use function trim;
 use function unlink;
 use function urlencode;
 
@@ -26,31 +36,33 @@ class Svg extends Repository
         return Helper::repository(self::class);
     }
 
-    public function isSvBrowserDetectionActive() : bool
+    public function isSvBrowserDetectionActive(): bool
     {
         return array_key_exists('SV/BrowserDetection', \XF::app()->container('addon.cache'));
     }
 
-    public function isSvg2PngEnabled() : bool
+    public function isSvg2PngEnabled(): bool
     {
         $renderSvgAsPng = \XF::options()->svSvgTemplate_renderSvgAsPng ?? [];
         $conversationMethod = $renderSvgAsPng['type'] ?? '';
-        switch($conversationMethod)
+        switch ($conversationMethod)
         {
             case 'imagick':
                 return $this->convertSvg2PngImagickEnabled();
             case 'cli':
                 $command = trim($renderSvgAsPng['cli'] ?? '');
+
                 return $this->convertSvg2PngCliEnabled($command);
             case 'cli-pipe':
                 $command = trim($renderSvgAsPng['cli_pipe'] ?? '');
+
                 return $this->convertSvg2PngCliPipeEnabled($command);
             default:
                 return false;
         }
     }
 
-    public function requiresConvertingSvg2Png() : bool
+    public function requiresConvertingSvg2Png(): bool
     {
         if (!$this->isSvBrowserDetectionActive())
         {
@@ -75,7 +87,7 @@ class Svg extends Repository
 
         $renderSvgAsPng = \XF::options()->svSvgTemplate_renderSvgAsPng ?? [];
         $conversationMethod = $renderSvgAsPng['type'] ?? '';
-        switch($conversationMethod)
+        switch ($conversationMethod)
         {
             case 'imagick':
                 if ($this->convertSvg2PngImagickEnabled())
@@ -168,7 +180,7 @@ class Svg extends Repository
         try
         {
             $command = strtr($command, [
-                '{destFile}' => $tempDestFile,
+                '{destFile}'   => $tempDestFile,
                 '{sourceFile}' => $tempSourceFile,
             ]);
 
@@ -259,6 +271,7 @@ class Svg extends Repository
             if (!$pngSupport && $extension === 'png' && \XF::$debugMode)
             {
                 \XF::logError("Requesting a png for {$filename}.svg, but is svg => png transcoding is not enabled");
+
                 return '';
             }
 

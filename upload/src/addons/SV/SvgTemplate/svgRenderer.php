@@ -22,10 +22,22 @@ use XF\Entity\Template as TemplateEntity;
 use XF\Http\ResponseStream;
 use XF\Template\Templater;
 use XF\Util\File;
+use function array_unique;
 use function gzdecode;
+use function gzencode;
+use function implode;
+use function is_array;
+use function is_callable;
+use function is_string;
 use function libxml_clear_errors;
 use function libxml_use_internal_errors;
-use function preg_match, trim, strlen, is_array, reset, is_string, array_unique, sort, md5, implode, strval, gzencode, is_callable;
+use function md5;
+use function preg_match;
+use function reset;
+use function sort;
+use function strlen;
+use function strval;
+use function trim;
 
 class svgRenderer extends CssRenderer
 {
@@ -104,7 +116,7 @@ class svgRenderer extends CssRenderer
         $pngSupported = Globals::templateHelper($this->templater)->svPngSupportEnabled ?? false;
         // only support rendering 1 svg/png at a time
         $checkedTemplates = [];
-        foreach ($templates AS $template)
+        foreach ($templates as $template)
         {
             if (!preg_match('/^([a-z\d_]+:|)([a-z\d_]+?)(?:\.(svg|png)|)$/i', $template, $matches))
             {
@@ -113,7 +125,7 @@ class svgRenderer extends CssRenderer
 
             $extension = $matches[3] ?? '';
 
-            switch($extension)
+            switch ($extension)
             {
                 case '':
                 case 'svg':
@@ -270,11 +282,11 @@ class svgRenderer extends CssRenderer
 
         $template = Helper::instantiateEntity(TemplateEntity::class, [
             'template_id' => -1,
-            'title' => $tmpTemplateName,
-            'type' => 'public',
-            'style_id' => $styleId,
-            'addon_id' => 'SV/SvgTemplate',
-            'template' => $templateCode,
+            'title'       => $tmpTemplateName,
+            'type'        => 'public',
+            'style_id'    => $styleId,
+            'addon_id'    => 'SV/SvgTemplate',
+            'template'    => $templateCode,
         ]);
         $template->setReadOnly(true);
 
@@ -335,7 +347,7 @@ class svgRenderer extends CssRenderer
         if ($this->lessParser === null)
         {
             $options = [
-                'compress' => $this->compactSvg,
+                'compress'    => $this->compactSvg,
                 'indentation' => ' ',
             ];
             $this->lessParser = new Less_Parser($options);

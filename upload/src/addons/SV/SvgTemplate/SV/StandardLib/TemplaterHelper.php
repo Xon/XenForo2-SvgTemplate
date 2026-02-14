@@ -46,9 +46,9 @@ class TemplaterHelper extends XFCP_TemplaterHelper
     {
         $xf['svg'] = [
             'enabled' => true,
-            'as' => [
+            'as'      => [
                 'png' => $this->svPngSupportEnabled,
-            ]
+            ],
         ];
     }
 
@@ -63,7 +63,7 @@ class TemplaterHelper extends XFCP_TemplaterHelper
      */
     public function fnGetSvgUrlAs(BaseTemplater $templater, &$escape, string $template, string $extension, bool $includeValidation = false)
     {
-        return $this->svSvgRepo->getSvgUrl($templater, $escape, $template, $this->svPngSupportEnabled , $this->automaticSvgUrlWriting, $includeValidation, $extension);
+        return $this->svSvgRepo->getSvgUrl($templater, $escape, $template, $this->svPngSupportEnabled, $this->automaticSvgUrlWriting, $includeValidation, $extension);
     }
 
     /**
@@ -76,6 +76,6 @@ class TemplaterHelper extends XFCP_TemplaterHelper
      */
     public function fnGetSvgUrl(BaseTemplater $templater, &$escape, string $template, bool $includeValidation = false)
     {
-        return $this->svSvgRepo->getSvgUrl($templater, $escape, $template, $this->svPngSupportEnabled , $this->automaticSvgUrlWriting, $includeValidation, '');
+        return $this->svSvgRepo->getSvgUrl($templater, $escape, $template, $this->svPngSupportEnabled, $this->automaticSvgUrlWriting, $includeValidation, '');
     }
 }

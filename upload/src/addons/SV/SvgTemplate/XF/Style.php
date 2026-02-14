@@ -3,9 +3,10 @@
 namespace SV\SvgTemplate\XF;
 
 use SV\SvgTemplate\Globals;
-use function array_key_exists;
-use function is_callable, is_array, preg_replace_callback;
+use function is_array;
+use function is_callable;
 use function is_string;
+use function preg_replace_callback;
 
 /**
  * @extends \XF\Style
@@ -20,18 +21,20 @@ class Style extends XFCP_Style
         {
             $this->injectSvgStylePropertyBits();
         }
+
         return parent::getProperty($name, $fallback);
     }
 
     /**
      * XF2.3+
      */
-    public function getPropertyVariation(string $name, string $variation,  $fallback = '')
+    public function getPropertyVariation(string $name, string $variation, $fallback = '')
     {
         if ($this->todoReplacement)
         {
             $this->injectSvgStylePropertyBits();
         }
+
         return parent::getPropertyVariation($name, $variation, $fallback);
     }
 
@@ -42,6 +45,7 @@ class Style extends XFCP_Style
         {
             $this->injectSvgStylePropertyBits();
         }
+
         return parent::getProperties();
     }
 
@@ -51,6 +55,7 @@ class Style extends XFCP_Style
         {
             $this->injectSvgStylePropertyBits();
         }
+
         return parent::getVariationVariables($variation, $colors);
     }
 
@@ -68,7 +73,7 @@ class Style extends XFCP_Style
         $templater = $app->templater();
         $templaterHelper = Globals::templateHelper($templater);
 
-        if (!is_callable([$templaterHelper,'fnGetSvgUrlAs']))
+        if (!is_callable([$templaterHelper, 'fnGetSvgUrlAs']))
         {
             return;
         }
@@ -85,17 +90,18 @@ class Style extends XFCP_Style
                     $seen[$template] = $output;
                 }
                 $changes = $output !== $template;
+
                 return $output;
             }, $component);
         };
 
         $variableKey = \XF::$versionId >= 2030000 ? static::VARIABLE_KEY : '';
 
-        foreach($this->properties as &$property)
+        foreach ($this->properties as &$property)
         {
             if (is_array($property))
             {
-                foreach($property as &$component)
+                foreach ($property as &$component)
                 {
                     if (is_string($component) && $component !== '')
                     {
@@ -110,7 +116,7 @@ class Style extends XFCP_Style
                 $variants = $property[$variableKey] ?? null;
                 if (is_array($variants))
                 {
-                    foreach($variants as $key => $variable)
+                    foreach ($variants as $key => $variable)
                     {
                         if (is_string($variable) && $variable !== '')
                         {

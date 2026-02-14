@@ -20,7 +20,7 @@ class SvgRenderer extends AbstractController
         $c = $app->container();
 
         $renderer = \SV\SvgTemplate\svgRenderer::factory($app, $templater);
-        $writer = \SV\SvgTemplate\svgWriter::factory($app,$renderer);
+        $writer = \SV\SvgTemplate\svgWriter::factory($app, $renderer);
         $writer->setValidator($c['css.validator']);
 
         $showDebugOutput = (\XF::$debugMode && $request->get('_debug'));

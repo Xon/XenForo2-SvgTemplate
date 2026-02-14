@@ -12,6 +12,7 @@ abstract class Globals
 
     /**
      * NOT USED. Exists to ensure upgrades from older versions do not cause errors
+     *
      * @deprecated
      */
     public static $templater = null;
