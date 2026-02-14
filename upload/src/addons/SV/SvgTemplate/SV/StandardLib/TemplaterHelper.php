@@ -28,12 +28,14 @@ class TemplaterHelper extends XFCP_TemplaterHelper
         parent::setup();
     }
 
+    /** @noinspection SpellCheckingInspection */
     public function addDefaultHandlers()
     {
         parent::addDefaultHandlers();
 
         $this->addFunction('getsvgurl', 'fnGetSvgUrl');
         $this->addFunction('getsvgurlas', 'fnGetSvgUrlAs');
+        $this->addFunction('getsvgasinlinecss', 'fnGetSvgAsInlineCss');
     }
 
     protected function populateTemplaterGlobalData(array &$data, ?AbstractReply $reply = null)
@@ -52,18 +54,25 @@ class TemplaterHelper extends XFCP_TemplaterHelper
         ];
     }
 
+    public function fnGetSvgAsInlineCss(BaseTemplater $templater, ?bool &$escape, string $template, bool $base64Encode = false, bool $escapeAllWhiteSpace = false): string
+    {
+        $escape = false;
+
+        return $this->svSvgRepo->renderSvgAsInlineCss($templater, $template, $base64Encode, $escapeAllWhiteSpace);
+    }
+
     /**
      * @param BaseTemplater $templater
      * @param bool|null     $escape
      * @param string        $template
-     * @param string        $extension
+     * @param ?string       $extension
      * @param bool          $includeValidation
      * @return string|PreEscaped
      * @noinspection PhpMissingParamTypeInspection
      */
-    public function fnGetSvgUrlAs(BaseTemplater $templater, &$escape, string $template, string $extension, bool $includeValidation = false)
+    public function fnGetSvgUrlAs(BaseTemplater $templater, &$escape, string $template, ?string $extension, bool $includeValidation = false)
     {
-        return $this->svSvgRepo->getSvgUrl($templater, $escape, $template, $this->svPngSupportEnabled, $this->automaticSvgUrlWriting, $includeValidation, $extension);
+        return $this->svSvgRepo->getSvgUrl($templater, $escape, $template, $this->svPngSupportEnabled, $this->automaticSvgUrlWriting, $includeValidation, $extension ?? '');
     }
 
     /**

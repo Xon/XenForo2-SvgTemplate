@@ -98,6 +98,31 @@ inkscape --export-type=png -p
 
 LESS syntax inside of SVG's `<style>` attribute is supported, and internally is escaped as `<!CDATA[[ ... ]]>`
 
+## Inline SVG's into CSS images
+
+Method signature:
+```php
+public function getSvgAsInlineCss(string $template, bool $base64Encode = false, bool $escapeAllWhiteSpace = false)
+```
+The `$escapeAllWhiteSpace` argument encodes spaces to `%20` which is required for image srcset, this is not the default as in .css files it allows more compact representation 
+
+Note; The function will wrap the URL in `"` characters, and thus may conflict with inline style attributes which wrap in `"` characters.
+
+### Usage
+```
+.image {
+    background-image: url({{ getSvgAsInlineCss('sv_bbcode_modinterrupt_stop.svg') }});
+}
+```
+
+### Base64 encoded SVG
+
+```
+.image {
+    background-image: url({{ getSvgAsInlineCss('sv_bbcode_modinterrupt_stop.svg', true) }});
+}
+```
+
 ## Conditional rendering SVGs to PNG (for CSS/LESS)
 
 

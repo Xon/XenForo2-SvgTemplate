@@ -18,6 +18,9 @@ use XF\Mvc\Entity\Repository;
 use XF\Template\Templater;
 use XF\Util\File;
 use function array_key_exists;
+use function array_keys;
+use function array_values;
+use function base64_encode;
 use function extension_loaded;
 use function file_get_contents;
 use function file_put_contents;
@@ -25,6 +28,8 @@ use function in_array;
 use function is_callable;
 use function is_string;
 use function pathinfo;
+use function preg_replace;
+use function str_replace;
 use function strlen;
 use function strtr;
 use function system;
@@ -243,6 +248,8 @@ class Svg extends Repository
     {
         $app = \XF::app();
 
+        /** @var svgRenderer $renderer */
+        /** @var Response $response */
         [$renderer, $response] = $this->renderSvg($app->templater(), $input['svg'] ?? '', $input['s'], $input['l'], $input['k'], $input['d']);
         if ($response->httpCode() === 304)
         {
@@ -257,7 +264,7 @@ class Svg extends Repository
         $response->send($app->request());
     }
 
-    public function renderSvg(Templater $templater, string $template, ?int $styleId, ?int $languageId, ?bool $validation, ?int $date = null): array
+    public function renderSvg(Templater $templater, string $template, ?int $styleId, ?int $languageId, ?bool $validation, ?int $date = null, bool $allow304 = true): array
     {
         $app = \XF::app();
 
@@ -265,13 +272,10 @@ class Svg extends Repository
         $writer = svgWriter::factory($app, $renderer);
         $writer->setValidator($app->container('css.validator'));
 
-        if (!$renderer->showDebugOutput && $writer->canSend304($app->request()))
+        if ($allow304 && !$renderer->showDebugOutput && $writer->canSend304($app->request()))
         {
             return [$renderer, $writer->get304Response()];
         }
-
-        $styleId = $styleId ?? $templater->getStyleId();
-        $languageId = $languageId ?? $templater->getLanguage()->getId();
 
         return [$renderer, $writer->run([$template], $styleId, $languageId, $validation, $date)];
     }
@@ -324,6 +328,115 @@ class Svg extends Repository
         }
 
         return [$filename, $finalExtension];
+    }
+
+    public function renderSvgAsInlineCss(Templater $templater, string $template, bool $base64Encode, bool $escapeAllWhiteSpace): string
+    {
+        $templateInfo = $this->parseTemplateName($template, false, false, 'svg');
+        if ($templateInfo === null)
+        {
+            return '';
+        }
+        [$filename, $finalExtension] = $templateInfo;
+
+        $template = 'public:' . $filename . '.' . $finalExtension;
+
+        $renderer = svgRenderer::factory(\XF::app(), $templater);
+        $error = null;
+        $output = $renderer->renderTemplate($template, $error);
+        if ($error !== null)
+        {
+            throw new \LogicException("Failed to render {$template} as inline css");
+        }
+        else if ($output === '')
+        {
+            $output = '<svg xmlns=\'http://www.w3.org/2000/svg\'></svg>';
+        }
+
+        if ($base64Encode)
+        {
+            $output = base64_encode($output);
+
+            return 'data:image/svg+xml;base64,' . $output;
+        }
+
+        // https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/url_function#url
+        // The quotes are generally optional—they are required if the URL includes parentheses, whitespace, or quotes (unless these characters are escaped), or if the address includes control characters above 0x7e.
+        // Normal string syntax rules apply: double quotes cannot occur inside double quotes and single quotes cannot occur inside single quotes unless escaped
+
+        // replacements for shorter colors due to # being escaped
+        $replacements = $this->shorterCssColorNames();
+        if ($escapeAllWhiteSpace)
+        {
+            $replacements['%20'] = '/\s+/';
+        }
+        $output = preg_replace(array_values($replacements), array_keys($replacements), $output);
+
+        // unconditional replacements
+        $output = str_replace(['"', '#'], ["'", '%23'], $output);
+
+        return '"data:image/svg+xml,' . $output . '"';
+    }
+
+    protected function shorterCssColorNames() : array
+    {
+        /** @noinspection SpellCheckingInspection */
+        return [
+            'aqua'     => '/#00ffff(ff)?(?!\w)|#0ff(f)?(?!\w)/i',
+            'azure'    => '/#f0ffff(ff)?(?!\w)/i',
+            'beige'    => '/#f5f5dc(ff)?(?!\w)/i',
+            'bisque'   => '/#ffe4c4(ff)?(?!\w)/i',
+            'black'    => '/#000000(ff)?(?!\w)|#000(f)?(?!\w)/i',
+            'blue'     => '/#0000ff(ff)?(?!\w)|#00f(f)?(?!\w)/i',
+            'brown'    => '/#a52a2a(ff)?(?!\w)/i',
+            'coral'    => '/#ff7f50(ff)?(?!\w)/i',
+            'cornsilk' => '/#fff8dc(ff)?(?!\w)/i',
+            'crimson'  => '/#dc143c(ff)?(?!\w)/i',
+            'cyan'     => '/#00ffff(ff)?(?!\w)|#0ff(f)?(?!\w)/i',
+            'darkblue' => '/#00008b(ff)?(?!\w)/i',
+            'darkcyan' => '/#008b8b(ff)?(?!\w)/i',
+            'darkgrey' => '/#a9a9a9(ff)?(?!\w)/i',
+            'darkred'  => '/#8b0000(ff)?(?!\w)/i',
+            'deeppink' => '/#ff1493(ff)?(?!\w)/i',
+            'dimgrey'  => '/#696969(ff)?(?!\w)/i',
+            'gold'     => '/#ffd700(ff)?(?!\w)/i',
+            'green'    => '/#008000(ff)?(?!\w)/i',
+            'grey'     => '/#808080(ff)?(?!\w)/i',
+            'honeydew' => '/#f0fff0(ff)?(?!\w)/i',
+            'hotpink'  => '/#ff69b4(ff)?(?!\w)/i',
+            'indigo'   => '/#4b0082(ff)?(?!\w)/i',
+            'ivory'    => '/#fffff0(ff)?(?!\w)/i',
+            'khaki'    => '/#f0e68c(ff)?(?!\w)/i',
+            'lavender' => '/#e6e6fa(ff)?(?!\w)/i',
+            'lime'     => '/#00ff00(ff)?(?!\w)|#0f0(f)?(?!\w)/i',
+            'linen'    => '/#faf0e6(ff)?(?!\w)/i',
+            'maroon'   => '/#800000(ff)?(?!\w)/i',
+            'moccasin' => '/#ffe4b5(ff)?(?!\w)/i',
+            'navy'     => '/#000080(ff)?(?!\w)/i',
+            'oldlace'  => '/#fdf5e6(ff)?(?!\w)/i',
+            'olive'    => '/#808000(ff)?(?!\w)/i',
+            'orange'   => '/#ffa500(ff)?(?!\w)/i',
+            'orchid'   => '/#da70d6(ff)?(?!\w)/i',
+            'peru'     => '/#cd853f(ff)?(?!\w)/i',
+            'pink'     => '/#ffc0cb(ff)?(?!\w)/i',
+            'plum'     => '/#dda0dd(ff)?(?!\w)/i',
+            'purple'   => '/#800080(ff)?(?!\w)/i',
+            'red'      => '/#ff0000(ff)?(?!\w)|#f00(f)?(?!\w)/i',
+            'salmon'   => '/#fa8072(ff)?(?!\w)/i',
+            'seagreen' => '/#2e8b57(ff)?(?!\w)/i',
+            'seashell' => '/#fff5ee(ff)?(?!\w)/i',
+            'sienna'   => '/#a0522d(ff)?(?!\w)/i',
+            'silver'   => '/#c0c0c0(ff)?(?!\w)/i',
+            'skyblue'  => '/#87ceeb(ff)?(?!\w)/i',
+            'snow'     => '/#fffafa(ff)?(?!\w)/i',
+            'tan'      => '/#d2b48c(ff)?(?!\w)/i',
+            'teal'     => '/#008080(ff)?(?!\w)/i',
+            'thistle'  => '/#d8bfd8(ff)?(?!\w)/i',
+            'tomato'   => '/#ff6347(ff)?(?!\w)/i',
+            'violet'   => '/#ee82ee(ff)?(?!\w)/i',
+            'wheat'    => '/#f5deb3(ff)?(?!\w)/i',
+            'white'    => '/#ffffff(ff)?(?!\w)|#fff(f)?(?!\w)/i',
+        ];
     }
 
     public function getSvgUrl(Templater $templater, &$escape, string $template, bool $pngSupport, bool $autoUrlRewrite, bool $includeValidation, string $forceExtension): string
