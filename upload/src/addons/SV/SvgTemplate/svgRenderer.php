@@ -54,6 +54,8 @@ class svgRenderer extends CssRenderer
     protected $inputModifiedDate = null;
     /** @var Redis */
     protected $redisCache = null;
+    /** @var bool */
+    public $showDebugOutput = false;
 
     public function __construct(BaseApp $app, Templater $templater)
     {
@@ -68,6 +70,7 @@ class svgRenderer extends CssRenderer
             $this->allowCached = true;
         }
 
+        $this->showDebugOutput = \XF::$debugMode && $app->request()->get('_debug');
         $this->redisCache = Helper::isAddOnActive('SV/RedisCache') ? RedisRepository::get()->getRedisObj($cache) : null;
     }
 

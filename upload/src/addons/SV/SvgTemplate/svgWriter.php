@@ -40,8 +40,7 @@ class svgWriter extends CssWriter
             $renderer->setInputModifiedDate($date);
         }
 
-        $showDebugOutput = (\XF::$debugMode && $request->get('_debug'));
-        if (!$showDebugOutput && strpos($request->getServer('HTTP_ACCEPT_ENCODING', ''), 'gzip') !== false)
+        if (!$this->renderer->showDebugOutput && strpos($request->getServer('HTTP_ACCEPT_ENCODING', ''), 'gzip') !== false)
         {
             $renderer->setForceRawCache(true);
         }

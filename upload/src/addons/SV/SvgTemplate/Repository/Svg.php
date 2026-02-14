@@ -7,10 +7,13 @@ use ImagickPixel;
 use LogicException;
 use SV\BrowserDetection\Listener;
 use SV\StandardLib\Helper;
+use SV\SvgTemplate\svgRenderer;
+use SV\SvgTemplate\svgWriter;
 use SV\SvgTemplate\XF\Template\Exception\UnsupportedExtensionProvidedException;
 use Symfony\Component\Process\Process;
 use XF\Entity\ClassExtension as ClassExtensionEntity;
 use XF\Finder\ClassExtension as ClassExtensionFinder;
+use XF\Http\Response;
 use XF\Mvc\Entity\Repository;
 use XF\Template\Templater;
 use XF\Util\File;
@@ -236,6 +239,42 @@ class Svg extends Repository
         return is_string($img) ? $img : '';
     }
 
+    public function renderSvgResponse(array $input): void
+    {
+        $app = \XF::app();
+
+        [$renderer, $response] = $this->renderSvg($app->templater(), $input['svg'] ?? '', $input['s'], $input['l'], $input['k'], $input['d']);
+        if ($response->httpCode() === 304)
+        {
+            $response->send($app->request());
+        }
+
+        if ($renderer->showDebugOutput)
+        {
+            $response->contentType('text/html', 'utf-8');
+            $response->body($app->debugger()->getDebugPageHtml($app));
+        }
+        $response->send($app->request());
+    }
+
+    public function renderSvg(Templater $templater, string $template, ?int $styleId, ?int $languageId, ?bool $validation, ?int $date = null): array
+    {
+        $app = \XF::app();
+
+        $renderer = svgRenderer::factory($app, $templater);
+        $writer = svgWriter::factory($app, $renderer);
+        $writer->setValidator($app->container('css.validator'));
+
+        if (!$renderer->showDebugOutput && $writer->canSend304($app->request()))
+        {
+            return [$renderer, $writer->get304Response()];
+        }
+
+        $styleId = $styleId ?? $templater->getStyleId();
+        $languageId = $languageId ?? $templater->getLanguage()->getId();
+
+        return [$renderer, $writer->run([$template], $styleId, $languageId, $validation, $date)];
+    }
 
     protected function parseTemplateName(string $template, bool $pngSupport, bool $autoUrlRewrite, string $forceExtension): ?array
     {
