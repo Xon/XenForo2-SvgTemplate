@@ -8,6 +8,7 @@ namespace SV\SvgTemplate;
 
 use DOMAttr;
 use DOMDocument;
+use DOMElement;
 use DOMNode;
 use Exception;
 use Less_Parser;
@@ -450,8 +451,9 @@ class svgRenderer extends CssRenderer
             libxml_clear_errors();
         }
 
+        /** @var DOMElement|null $rootElement */
         $rootElement = $doc->documentElement;
-        if (!$rootElement)
+        if ($rootElement === null)
         {
             // invalid XML
             throw new UnableToRewriteSvgException($template, 'SVGs must be valid XML');
@@ -459,6 +461,11 @@ class svgRenderer extends CssRenderer
         $doc->encoding = 'utf-8';
         $doc->formatOutput = false;
 
+        // ensure svg's have the expected namespace
+        if (!$rootElement->hasAttribute('xmlns'))
+        {
+            $rootElement->setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        }
         $rootElement->removeAttribute('xml:space');
         $stylingChunks = [];
         $this->cleanNodeList($rootElement, $stylingChunks);
