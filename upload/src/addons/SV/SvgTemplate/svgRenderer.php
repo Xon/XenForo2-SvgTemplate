@@ -325,6 +325,12 @@ class svgRenderer extends CssRenderer
             return null;
         }
 
+        $options = \XF::options();
+        $embedTemplateNames = $options->offsetExists('embedTemplateNames') && $options->embedTemplateNames;
+        if ($embedTemplateNames)
+        {
+            \XF::options()->embedTemplateNames = false;
+        }
         try
         {
             $this->lastRenderedTemplate = $template;
@@ -346,6 +352,13 @@ class svgRenderer extends CssRenderer
             $error = $e->getMessage();
 
             return null;
+        }
+        finally
+        {
+            if ($embedTemplateNames)
+            {
+                \XF::options()->embedTemplateNames = true;
+            }
         }
     }
 
