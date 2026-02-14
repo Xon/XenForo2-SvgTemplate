@@ -22,6 +22,7 @@ use XF\Entity\Template as TemplateEntity;
 use XF\Http\ResponseStream;
 use XF\Template\Templater;
 use XF\Util\File;
+use function array_reverse;
 use function array_unique;
 use function gzdecode;
 use function gzencode;
@@ -359,7 +360,7 @@ class svgRenderer extends CssRenderer
         return $this->lessParser;
     }
 
-    protected function cleanNodeList(DOMNode $parentNode, string &$styling): void
+    protected function cleanNodeList(DOMNode $parentNode, array &$styling): void
     {
         $compactSvg = $this->compactSvg;
         // iterate backwards as this allows removing elements, as the list is "dynamic"
@@ -375,7 +376,7 @@ class svgRenderer extends CssRenderer
                     $nodeName = $node->nodeName;
                     if ($nodeName === 'style')
                     {
-                        $styling .= "\n" . $node->textContent;
+                        $styling[] = $node->textContent;
                         $node->parentNode->removeChild($node);
                         $checkChildren = false;
                         break;
@@ -459,11 +460,12 @@ class svgRenderer extends CssRenderer
         $doc->formatOutput = false;
 
         $rootElement->removeAttribute('xml:space');
-        $styling = '';
-        $this->cleanNodeList($rootElement, $styling);
+        $stylingChunks = [];
+        $this->cleanNodeList($rootElement, $stylingChunks);
+        $stylingChunks = array_reverse($stylingChunks);
 
         // convert various styling blocks less => css
-        $styling = trim($styling);
+        $styling = trim(implode("\n", $stylingChunks));
         if (strlen($styling) !== 0)
         {
             $parser = $this->getFreshLessParser();
