@@ -94,6 +94,10 @@ inkscape --export-type=png -p
 
 # Features
 
+## LESS in svg's <style> attribute
+
+LESS syntax inside of SVG's `<style>` attribute is supported, and internally is escaped as `<!CDATA[[ ... ]]>`
+
 ## Conditional rendering SVGs to PNG (for CSS/LESS)
 
 

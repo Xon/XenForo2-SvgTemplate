@@ -35,10 +35,12 @@ use function libxml_clear_errors;
 use function libxml_use_internal_errors;
 use function md5;
 use function preg_match;
+use function preg_replace_callback;
 use function reset;
 use function sort;
 use function strlen;
 use function strval;
+use function substr_compare;
 use function trim;
 
 class svgRenderer extends CssRenderer
@@ -432,8 +434,23 @@ class svgRenderer extends CssRenderer
         }
     }
 
+    protected const cdataStart = '<![CDATA[';
+    protected const cdataEnd = ']]>';
+
     protected function rewriteSvg(string $template, string $svg): string
     {
+        // support less inside <style></style> tags which can result in invalid XML, so do escaping
+        $svg = preg_replace_callback('#<style>\s*(.*?)\s*</style>#si', function (array $matches) {
+            $styleBlock = $matches[1];
+            if (substr_compare($styleBlock, self::cdataStart, 0, strlen(self::cdataStart), true) === 0 &&
+                substr_compare($styleBlock, self::cdataEnd, - strlen(self::cdataEnd), strlen(self::cdataEnd), false) === 0)
+            {
+                return $matches[0];
+            }
+
+            return "<style><![CDATA[{$styleBlock}]]></style>";
+        }, $svg);
+
         // The svg format is just plain-text XML. so we can load, prune and save
         $doc = new DOMDocument();
         $doc->preserveWhiteSpace = false;
