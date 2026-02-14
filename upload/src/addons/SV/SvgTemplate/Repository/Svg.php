@@ -236,7 +236,8 @@ class Svg extends Repository
         return is_string($img) ? $img : '';
     }
 
-    public function getSvgUrl(Templater $templater, &$escape, string $template, bool $pngSupport, bool $autoUrlRewrite, bool $includeValidation, string $forceExtension): string
+
+    protected function parseTemplateName(string $template, bool $pngSupport, bool $autoUrlRewrite, string $forceExtension): ?array
     {
         if ($template === '')
         {
@@ -250,11 +251,11 @@ class Svg extends Repository
         $hasExtension = strlen($extension) !== 0;
 
         $supportedExtensions = $pngSupport ? ['svg', 'png'] : ['svg'];
-        if ($forceExtension)
+        if ($forceExtension !== '')
         {
             if (!in_array($forceExtension, $supportedExtensions, true))
             {
-                return '';
+                return null;
             }
             $finalExtension = $forceExtension;
         }
@@ -272,16 +273,29 @@ class Svg extends Repository
             {
                 \XF::logError("Requesting a png for {$filename}.svg, but is svg => png transcoding is not enabled");
 
-                return '';
+                return null;
             }
 
             if ($forceExtension)
             {
-                return '';
+                return null;
             }
 
             throw new UnsupportedExtensionProvidedException($template);
         }
+
+        return [$filename, $finalExtension];
+    }
+
+    public function getSvgUrl(Templater $templater, &$escape, string $template, bool $pngSupport, bool $autoUrlRewrite, bool $includeValidation, string $forceExtension): string
+    {
+        $templateInfo = $this->parseTemplateName($template, $pngSupport, $autoUrlRewrite, $forceExtension);
+
+        if ($templateInfo === null)
+        {
+            return '';
+        }
+        [$filename, $finalExtension] = $templateInfo;
 
         $template = $filename . '.' . $finalExtension;
 
